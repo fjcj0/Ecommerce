@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, } from '@clerk/nextjs'
 import { checkConnection } from "@/utils/checkConnection";
+import { ApplyTheme } from "./components/ApplyTheme";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,8 +24,9 @@ export default function RootLayout({
   checkConnection();
   return (
     <ClerkProvider>
-      <html lang="en" data-theme='coffee'>
+      <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
+          <ApplyTheme />
           {children}
         </body>
       </html>

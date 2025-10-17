@@ -64,4 +64,9 @@ export const THEMES = [
         label: "Dracula",
         colors: ["#282A36", "#BD93F9", "#FF79C6"],
     },
+    {
+        name: "black",
+        label: "black",
+        colors: ["#b0bff00", "#F000F0", "black"]
+    }
 ];
