@@ -17,7 +17,7 @@ const Header = () => {
                         alt='logo'
                         width={70}
                         height={70}
-                        className='rounded-full'
+                        className='rounded-full rotate-infinite'
                     />
                 </Link>
             </div>
