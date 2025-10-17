@@ -7,7 +7,16 @@ module.exports = {
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        poppins: ["var(--font-poppins)", "sans-serif"],
+        playfair: ["var(--font-playfair)", "serif"],
+        raleway: ["var(--font-raleway)", "sans-serif"],
+        greatvibes: ["var(--font-greatvibes)", "cursive"],
+        inter: ["var(--font-inter)", "sans-serif"],
+        geistmono: ["var(--font-geist-mono)", "monospace"],
+      },
+    },
   },
   plugins: [daisyui],
   daisyui: {

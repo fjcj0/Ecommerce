@@ -8,8 +8,8 @@ import ThemeSelector from './ThemeSelector';
 import { links } from '@/data/headerData';
 const Header = () => {
     return (
-        <div className='flex justify-between top-0 sticky items-center py-4 px-20 bg-base-200/80 z-50
-        border-b-[0.2px] border-base-content/30 h-[6rem]'>
+        <div className='flex justify-between top-0 sticky items-center px-3 md:px-20 bg-base-200/80 z-50
+        border-b-[0.2px] border-base-content/30 h-[7rem]'>
             <div>
                 <Link href={'/'}>
                     <Image
@@ -21,7 +21,7 @@ const Header = () => {
                     />
                 </Link>
             </div>
-            <div className='hidden md:flex items-start justify-start gap-7'>
+            <div className='hidden lg:flex items-start justify-start gap-7'>
                 {links.map((link, index) => (
                     <div key={index} className="relative group">
                         <span className="absolute right-0 -top-1 w-0 h-[2px] bg-base-content transition-all duration-300 group-hover:w-full"></span>
@@ -35,7 +35,7 @@ const Header = () => {
             <div className='flex items-center justify-center gap-3'>
                 <SignedOut>
                     <SignInButton mode='modal'>
-                        <button className="btn bg-white/10 text-white rounded-lg hover:bg-white/30 transition-all duration-300 flex items-center gap-2">
+                        <button className="btn bg-primary/50 text-primary/80 rounded-lg hover:bg-primary/20 hover:text-primary border-none transition-all duration-300 flex items-center gap-2">
                             <svg
                                 role="img"
                                 viewBox="0 0 24 24"
