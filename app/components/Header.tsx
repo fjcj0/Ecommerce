@@ -9,7 +9,7 @@ import { links } from '@/data/headerData';
 const Header = () => {
     return (
         <div className='flex justify-between top-0 sticky items-center py-4 px-20 bg-base-200/80 z-50
-        border-b-[0.2px] border-primary/20 h-[6rem]'>
+        border-b-[0.2px] border-base-content/30 h-[6rem]'>
             <div>
                 <Link href={'/'}>
                     <Image
@@ -21,11 +21,10 @@ const Header = () => {
                     />
                 </Link>
             </div>
-            <div className='flex items-start justify-start gap-7'>
+            <div className='hidden md:flex items-start justify-start gap-7'>
                 {links.map((link, index) => (
                     <div key={index} className="relative group">
                         <span className="absolute right-0 -top-1 w-0 h-[2px] bg-base-content transition-all duration-300 group-hover:w-full"></span>
-
                         <button className='font-light primary relative z-10'>
                             {link.name}
                         </button>

@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden`}>
           <ApplyTheme />
           {children}
         </body>
