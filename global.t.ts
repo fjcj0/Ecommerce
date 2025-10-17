@@ -1,13 +1,32 @@
+import { LucideIcon } from "lucide-react";
+
 export interface cardProps {
     name: string;
     image: string;
     description: string;
     to: string;
-    discount: number
-};
+    discount: number;
+}
 
 export interface aboutCardProps {
     title: string;
     benefits: string[];
     isOdd: boolean;
-};
+}
+
+export interface cardDashboardProps {
+    icon: LucideIcon;
+    title: string;
+    value: number;
+    decrease?: number;
+    increase?: number;
+    isMoney: boolean;
+}
+
+export interface topProductProps {
+    name: string;
+    increase?: number;
+    decrease?: number;
+    image: string;
+    sold?: number;
+}

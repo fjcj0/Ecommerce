@@ -1,4 +1,5 @@
-import { LayoutDashboard, StoreIcon, ListOrderedIcon, CheckSquare, PlusSquare, Star, Package } from 'lucide-react';
+import { cardDashboardProps, topProductProps } from '@/global.t';
+import { LayoutDashboard, StoreIcon, ListOrderedIcon, CheckSquare, PlusSquare, Star, Package, Users, DollarSign } from 'lucide-react';
 export const shoes = [
     {
         name: 'Nike',
@@ -111,4 +112,59 @@ export const adminLinks = [
         icon: Star,
         to: '/admin/reviews',
     },
+    {
+        name: 'Users',
+        icon: Users,
+        to: '/admin/users',
+    }
+];
+export const cardsDashboard: cardDashboardProps[] = [
+    {
+        icon: DollarSign,
+        title: "Total Sales",
+        value: 45230,
+        increase: 18.5,
+        isMoney: true,
+    },
+    {
+        icon: Package,
+        title: "Total Products",
+        value: 320,
+        decrease: 5.2,
+        isMoney: false,
+    },
+    {
+        icon: Users,
+        title: "Total Users",
+        value: 540,
+        isMoney: false,
+    },
+    {
+        icon: ListOrderedIcon,
+        title: "Total Orders",
+        value: 1280,
+        increase: 7.8,
+        isMoney: false,
+    },
+];
+
+export const topProducts: topProductProps[] = [
+    {
+        name: 'Nike',
+        increase: 20.3,
+        image: '/shoes/shoes1.png',
+        sold: 1249
+    },
+    {
+        name: 'Adidas',
+        decrease: 15,
+        image: '/shoes/shoes2.png',
+        sold: 980
+    },
+    {
+        name: 'Puma',
+        increase: 10,
+        image: '/shoes/shoes3.png',
+        sold: 1120
+    }
 ];
