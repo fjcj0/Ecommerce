@@ -1,7 +1,8 @@
 "use client";
 import { ReactNode, useState, useEffect } from "react";
 import Slider from "./components/Slider";
-import useSlideStore from "@/store/slideStore";;
+import useSlideStore from "@/store/slideStore"; import Header from "./components/Header";
+;
 export default function AdminLayout({ children }: { children: ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const { isSlideOpen } = useSlideStore();
@@ -16,6 +17,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 className={`absolute right-0 h-full duration-300
                  ${isSlideOpen ? "md:w-[calc(100%-18rem)]" : "md:w-[calc(100%-5rem)]"
                     } `}>
+                <Header />
                 {children}
             </div>
         </main>

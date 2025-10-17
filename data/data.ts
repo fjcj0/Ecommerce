@@ -1,3 +1,4 @@
+import { LayoutDashboard, StoreIcon, ListOrderedIcon, CheckSquare, PlusSquare, Star, Package } from 'lucide-react';
 export const shoes = [
     {
         name: 'Nike',
@@ -36,7 +37,6 @@ export const links = [
         toSection: "contact",
     }
 ];
-
 export const about = [
     {
         title: 'Comfort & Fit',
@@ -61,5 +61,54 @@ export const about = [
             "Slip-resistant soles for safety and stability",
             "Lightweight construction for better performance during activities",
         ],
+    },
+];
+export const userLinks = [
+    {
+        name: 'Dashboard',
+        icon: LayoutDashboard,
+        to: '/user',
+    },
+    {
+        name: 'Store',
+        icon: StoreIcon,
+        to: '/user/store',
+    },
+    {
+        name: 'Orders',
+        icon: ListOrderedIcon,
+        to: '/user/orders',
+    },
+    {
+        name: 'Checkouts',
+        icon: CheckSquare,
+        to: '/user/checkouts',
+    },
+];
+export const adminLinks = [
+    {
+        name: 'Dashboard',
+        icon: LayoutDashboard,
+        to: '/admin',
+    },
+    {
+        name: 'Products',
+        icon: Package,
+        to: '/admin/products',
+    },
+    {
+        name: 'Add Product',
+        icon: PlusSquare,
+        to: '/admin/add-product',
+    },
+    {
+        name: 'Orders',
+        icon: ListOrderedIcon,
+        to: '/admin/orders',
+    },
+    {
+        name: 'Reviews',
+        icon: Star,
+        to: '/admin/reviews',
     },
 ];

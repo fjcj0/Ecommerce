@@ -1,8 +1,8 @@
 import React from 'react';
 const page = () => {
     return (
-        <div>
-            admin layout
+        <div className='p-3'>
+            <h1 className='text-3xl font-bold font-raleway'>Dashboard Page</h1>
         </div>
     );
 }

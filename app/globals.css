@@ -12,3 +12,6 @@
     transform: rotate(360deg);
   }
 }
+*{
+    @apply transition-all duration-300 ease-linear;
+}
