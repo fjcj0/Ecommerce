@@ -14,7 +14,7 @@ export default function ChatLayoutClient({ children }: { children: ReactNode }) 
             <Slider />
             <div
                 className={`absolute right-0 h-full duration-300
-                 ${isSlideOpen ? "md:w-[calc(100%-18rem)]" : "md:w-[calc(100%-5rem)]"
+                 ${isSlideOpen ? "md:w-[calc(100%-18rem)] w-full" : "md:w-[calc(100%-5rem)] w-full"
                     } `}>
                 <Header />
                 {children}

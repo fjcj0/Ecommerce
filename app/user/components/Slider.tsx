@@ -3,11 +3,11 @@ import { useEffect, useState } from "react";
 import useSlideStore from "@/store/slideStore";
 import { userLinks } from "@/data/data";
 import Link from "next/link";
-import { Zap } from "lucide-react";
+import { XIcon, Zap } from "lucide-react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 const Slider = () => {
-    const { isSlideOpen } = useSlideStore();
+    const { isSlideOpen, toggleSlide } = useSlideStore();
     const [mounted, setMounted] = useState(false);
     const pathname = usePathname();
     useEffect(() => setMounted(true), []);
@@ -25,12 +25,15 @@ const Slider = () => {
                         : "items-center justify-center"
                         }`}
                 >
-                    <h1 className="flex items-center justify-center gap-1 text-xl">
-                        <Zap size={25} />{" "}
-                        <span className={`${isSlideOpen ? "block" : "hidden"}`}>
-                            Dashboard
-                        </span>
-                    </h1>
+                    <div className="w-full flex items-center justify-between gap-1 text-xl">
+                        <div className="flex items-center justify-center gap-1 text-xl">
+                            <Zap size={25} />{" "}
+                            <span className={`${isSlideOpen ? "block" : "hidden"}`}>
+                                Dashboard
+                            </span>
+                        </div>
+                        {isSlideOpen && <button type="button" className=" md:hidden flex btn btn-circle" onClick={toggleSlide}><XIcon /></button>}
+                    </div>
                 </div>
                 <div
                     className={`${isSlideOpen ? "w-full items-start justify-start" : "w-auto items-center justify-center"

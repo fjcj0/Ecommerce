@@ -8,7 +8,7 @@ const Header = () => {
     const { isSlideOpen, toggleSlide } = useSlideStore();
     return (
         <div className={`top-0 flex justify-between items-center px-5
-             w-full h-[5rem]
+             w-[96%] mx-auto my-3 rounded-full h-[5rem] bg-primary/20
              `}>
             <div>
                 <button type='button' className='btn btn-circle' onClick={toggleSlide}>
