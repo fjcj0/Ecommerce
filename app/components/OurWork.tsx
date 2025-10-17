@@ -2,7 +2,7 @@ import Image from 'next/image';
 import React from 'react';
 const OurWork = () => {
     return (
-        <div className="w-full flex flex-col items-center justify-center">
+        <div id='ourwork' className="w-full flex flex-col items-center justify-center">
             <div className="w-full grid lg:h-[40rem] lg:grid-cols-2 grid-cols-1">
                 <div className="w-auto h-auto py-10 bg-base-300 flex flex-col items-start  justify-center px-8">
                     <div className="flex flex-col gap-5 justify-end items-start">

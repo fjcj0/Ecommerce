@@ -1,9 +1,8 @@
 import Image from "next/image";
 import React from "react";
-
 const Home = () => {
     return (
-        <div className="my-36 w-full px-3 lg:px-32 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative">
+        <div id="home" className="my-36 w-full px-3 lg:px-32 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative">
             <div
                 className={`
     flex flex-col items-start justify-center gap-5 py-10

@@ -1,40 +1,51 @@
 "use client";
-import React from 'react';
-import { SignedIn, SignedOut, SignInButton, UserButton } from '@clerk/nextjs';
-import Image from 'next/image';
-import Link from 'next/link';
-import { ShoppingBagIcon } from 'lucide-react';
-import ThemeSelector from './ThemeSelector';
-import { links } from '@/data/data';
+import React from "react";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import Image from "next/image";
+import Link from "next/link";
+import { ShoppingBagIcon } from "lucide-react";
+import ThemeSelector from "./ThemeSelector";
+import { links } from "@/data/data";
 const Header = () => {
+    const handleScroll = (sectionId: string) => {
+        const element = document.getElementById(sectionId);
+        if (element) {
+            const yOffset = -112;
+            const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+            window.scrollTo({ top: y, behavior: "smooth" });
+        }
+    };
     return (
-        <div className='flex justify-between top-0 sticky items-center px-3 md:px-20 bg-base-200/80 z-50
-        border-b-[0.2px] border-base-content/30 h-[7rem]'>
+        <div className="flex justify-between top-0 sticky items-center px-3 md:px-20 bg-base-200/80 z-50
+        border-b-[0.2px] border-base-content/30 h-[7rem]">
             <div>
-                <Link href={'/'}>
+                <Link href={"/"}>
                     <Image
-                        src={'/logo.png'}
-                        alt='logo'
+                        src={"/logo.png"}
+                        alt="logo"
                         width={70}
                         height={70}
-                        className='rounded-full rotate-infinite'
+                        className="rounded-full rotate-infinite"
                     />
                 </Link>
             </div>
-            <div className='hidden lg:flex items-start justify-start gap-7'>
+            <div className="hidden lg:flex items-start justify-start gap-7">
                 {links.map((link, index) => (
                     <div key={index} className="relative group">
                         <span className="absolute right-0 -top-1 w-0 h-[2px] bg-base-content transition-all duration-300 group-hover:w-full"></span>
-                        <button className='font-light primary relative z-10'>
+                        <button
+                            className="font-light primary relative z-10"
+                            onClick={() => handleScroll(link.toSection)}
+                        >
                             {link.name}
                         </button>
                         <span className="absolute left-0 -bottom-1 w-0 h-[2px] bg-base-content transition-all duration-300 group-hover:w-full"></span>
                     </div>
                 ))}
             </div>
-            <div className='flex items-center justify-center gap-3'>
+            <div className="flex items-center justify-center gap-3">
                 <SignedOut>
-                    <SignInButton mode='modal'>
+                    <SignInButton mode="modal">
                         <button className="btn bg-primary/50 text-primary/80 rounded-lg hover:bg-primary/20 hover:text-primary border-none transition-all duration-300 flex items-center gap-2">
                             <svg
                                 role="img"
@@ -53,18 +64,20 @@ const Header = () => {
                     </SignInButton>
                 </SignedOut>
                 <SignedIn>
-                    <div className='flex items-center justify-center gap-3'>
+                    <div className="flex items-center justify-center gap-3">
                         <UserButton
                             appearance={{
                                 elements: {
-                                    userButtonAvatarBox: 'w-12 h-12',
+                                    userButtonAvatarBox: "w-12 h-12",
                                 },
                             }}
                         />
                         <div className="indicator">
                             <div className="p-2 rounded-full hover:bg-base-200 transition-colors">
                                 <ShoppingBagIcon className="size-5" />
-                                <span className="badge badge-sm badge-primary indicator-item rounded-3xl">0</span>
+                                <span className="badge badge-sm badge-primary indicator-item rounded-3xl">
+                                    0
+                                </span>
                             </div>
                         </div>
                     </div>

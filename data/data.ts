@@ -29,7 +29,7 @@ export const links = [
     },
     {
         name: "OUR WORK",
-        toSection: "our-work",
+        toSection: "ourwork",
     },
     {
         name: "CONTACT",

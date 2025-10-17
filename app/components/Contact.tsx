@@ -1,7 +1,7 @@
 import React from 'react';
 const Contact = () => {
     return (
-        <div className='mt-36 mb-10 w-full flex flex-col items-center justify-center'>
+        <div id='contact' className='mt-36 mb-10 w-full flex flex-col items-center justify-center'>
             <h1 className='text-5xl font-bold font-raleway'>Contact Us</h1>
             <div className='flex flex-col gap-3 w-full mt-8'>
                 <div className='w-full grid grid-cols-1 md:grid-cols-2 px-3 gap-3'>

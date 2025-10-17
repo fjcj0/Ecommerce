@@ -3,7 +3,7 @@ import AboutCard from './AboutCard';
 import { about } from '@/data/data';
 const About = () => {
     return (
-        <div className='my-36 flex flex-col items-center justify-center'>
+        <div id='about' className='my-36 flex flex-col items-center justify-center'>
             <h1 className='text-center font-bold text-5xl'>About <span className='text-base-content/60'>Us</span></h1>
             <div className='w-full flex flex-col justify-center items-center mt-8 gap-5'>
                 {about.map((ab, index) => (
