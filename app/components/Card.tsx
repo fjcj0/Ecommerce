@@ -5,8 +5,7 @@ import React from 'react';
 
 const Card = ({ name, image, description, to, discount }: cardProps) => {
     return (
-        <div className='w-[20rem] sm:w-[25rem] md:w-[30rem] lg:w-[35rem] h-[40rem] flex justify-start items-start'>
-
+        <div className='w-[20rem] sm:w-[25rem] md:w-[30rem] lg:w-[35rem] h-auto flex justify-start items-start'>
             <div className='w-1/2 flex h-full items-start justify-end'>
                 <Image
                     src={image}

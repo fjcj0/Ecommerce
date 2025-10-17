@@ -9,7 +9,7 @@ const NewCollection = () => {
             <h1 className='text-5xl font-raleway font-light text-primary'>
                 New <span className='text-base-content/60'>Collections</span>
             </h1>
-            <div className='flex items-center justify-center w-full mt-6'>
+            <div className='flex items-center justify-center w-full mt-8'>
                 <Marquee speed={50}
                     gradient={true}
                     gradientColor="rgba(17, 24, 39, 0)"

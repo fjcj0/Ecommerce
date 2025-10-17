@@ -5,3 +5,9 @@ export interface cardProps {
     to: string;
     discount: number
 };
+
+export interface aboutCardProps {
+    title: string;
+    benefits: string[];
+    isOdd: boolean;
+};

@@ -1,3 +1,4 @@
+import About from "./components/About";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import NewCollection from "./components/NewCollection";
@@ -7,6 +8,7 @@ export default function Page() {
       <Header />
       <Home />
       <NewCollection />
+      <About />
     </div>
   );
 }

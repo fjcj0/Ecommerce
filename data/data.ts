@@ -18,3 +18,48 @@ export const shoes = [
         description: 'Puma shoes provide versatile style and comfort with durable soles, breathable fabrics, and cushioned design, suitable for sports, outdoor activities, or everyday casual wear.',
     }
 ];
+export const links = [
+    {
+        name: "HOME",
+        toSection: "home",
+    },
+    {
+        name: "ABOUT",
+        toSection: "about",
+    },
+    {
+        name: "OUR WORK",
+        toSection: "our-work",
+    },
+    {
+        name: "CONTACT",
+        toSection: "contact",
+    }
+];
+
+export const about = [
+    {
+        title: 'Comfort & Fit',
+        benefits: [
+            "Cushioned insoles for all-day comfort",
+            "Ergonomic design that supports natural foot movement",
+            "Multiple sizes and widths for the perfect fit",
+        ],
+    },
+    {
+        title: 'Style & Design',
+        benefits: [
+            "Trendy designs suitable for all occasions",
+            "Variety of colors and patterns to match your style",
+            "Collaboration with top designers for exclusive collections",
+        ],
+    },
+    {
+        title: 'Durability & Performance',
+        benefits: [
+            "High-quality materials built to last",
+            "Slip-resistant soles for safety and stability",
+            "Lightweight construction for better performance during activities",
+        ],
+    },
+];

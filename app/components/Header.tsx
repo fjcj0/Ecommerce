@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ShoppingBagIcon } from 'lucide-react';
 import ThemeSelector from './ThemeSelector';
-import { links } from '@/data/headerData';
+import { links } from '@/data/data';
 const Header = () => {
     return (
         <div className='flex justify-between top-0 sticky items-center px-3 md:px-20 bg-base-200/80 z-50
