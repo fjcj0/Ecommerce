@@ -168,3 +168,29 @@ export const topProducts: topProductProps[] = [
         sold: 1120
     }
 ];
+export const products = [
+    {
+        title: 'Adidas',
+        price: 80.5,
+        sizes: ['XS', 'SM', 'M', 'L', 'XL'],
+        image: '/shoes/shoes1.png',
+        available: 20,
+        quantity: 30
+    },
+    {
+        title: 'Puma',
+        price: 70.0,
+        sizes: ['S', 'M', 'L'],
+        image: '/shoes/shoes2.png',
+        available: 15,
+        quantity: 25
+    },
+    {
+        title: 'Nike',
+        price: 95.0,
+        sizes: ['M', 'L', 'XL'],
+        image: '/shoes/shoes3.png',
+        available: 10,
+        quantity: 20
+    }
+];

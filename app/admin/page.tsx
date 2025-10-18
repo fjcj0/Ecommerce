@@ -39,7 +39,7 @@ const Page = () => {
                     <div className="w-full flex flex-col justify-start items-start gap-3 h-full bg-base-300 rounded-lg p-3">
                         <h1 className="font-bold">Total Order Delivered</h1>
                         <div className="w-full flex items-center justify-center h-full">
-                            <div className="radial-progress text-primary text-5xl" style={{ "--value": 70, "--size": "13rem" }} role="progressbar">
+                            <div className="radial-progress text-primary text-5xl font-bold" style={{ "--value": 70, "--size": "13rem" }} role="progressbar">
                                 70%
                             </div>
                         </div>
@@ -52,7 +52,7 @@ const Page = () => {
                             <h1 className="font-bold">Top Products</h1>
                             <button type="button" className="btn btn-outline">View All</button>
                         </div>
-                        <div className="w-full flex flex-col items-start my-3 max-h-56 gap-3 overflow-y-auto">
+                        <div className="w-full flex flex-col items-start my-3 font-poppins max-h-56 gap-3 overflow-y-auto">
                             {topProducts.map((product, index) => (
                                 <TopProduct
                                     key={index}
