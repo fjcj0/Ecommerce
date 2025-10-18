@@ -193,3 +193,39 @@ export const products = [
         quantity: 20
     }
 ];
+export const orders = [
+    {
+        title: 'Adidas',
+        price: 80.5,
+        sizes: ['XS', 'SM', 'M', 'L', 'XL'],
+        image: '/shoes/shoes1.png',
+        user: 'Sophia Turner',
+        profilePic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8cGVvcGxlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=800',
+        available: 20,
+        quantity: 30,
+        deliverStatus: 'delivered',
+    },
+    {
+        title: 'Puma',
+        price: 70.0,
+        sizes: ['S', 'M', 'L'],
+        image: '/shoes/shoes2.png',
+        user: 'Daniel Rivera',
+        profilePic: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NHx8cGVvcGxlfGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=800',
+        available: 15,
+        quantity: 25,
+        deliverStatus: 'process',
+
+    },
+    {
+        title: 'Nike',
+        price: 95.0,
+        sizes: ['M', 'L', 'XL'],
+        image: '/shoes/shoes3.png',
+        user: 'Marcus Lee',
+        profilePic: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTV8fHBlb3BsZXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&q=60&w=800',
+        available: 10,
+        quantity: 20,
+        deliverStatus: 'failed',
+    }
+];
