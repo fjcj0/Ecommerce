@@ -308,3 +308,24 @@ export const users = [
         status: true,
     },
 ];
+export const sales = [
+    {
+        title: 'Adidas',
+        price: 80.5,
+        image: '/shoes/shoes1.png',
+        date: '2022/2/1'
+    },
+    {
+        title: 'Puma',
+        price: 70.0,
+        image: '/shoes/shoes2.png',
+        date: '2025/3/3'
+    },
+    {
+        title: 'Nike',
+        price: 95.0,
+        image: '/shoes/shoes3.png',
+        date: '2024/5/5'
+
+    }
+];

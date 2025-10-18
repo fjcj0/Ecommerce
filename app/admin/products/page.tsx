@@ -41,6 +41,7 @@ const page = () => {
                                 <th>Available</th>
                                 <th>Quantity</th>
                                 <th>Sizes</th>
+                                <th>Visible</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,6 +66,7 @@ const page = () => {
                                     <td>{product.available}</td>
                                     <td>{product.quantity}</td>
                                     <td>{product.sizes.join(', ')}</td>
+                                    <td> <input type="checkbox" className="toggle" defaultChecked /></td>
                                 </tr>
                             ))}
                         </tbody>
