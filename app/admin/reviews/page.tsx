@@ -1,6 +1,6 @@
 import React from 'react';
 import { Trash, Edit } from 'lucide-react';
-import { orders, products } from '@/data/data';
+import { orders, products, reviews } from '@/data/data';
 import Image from 'next/image';
 const page = () => {
     return (
@@ -37,15 +37,13 @@ const page = () => {
                                 </th>
                                 <th>User</th>
                                 <th>Product</th>
-                                <th>Price</th>
-                                <th>Available</th>
-                                <th>Quantity</th>
-                                <th>Sizes</th>
-                                <th>Deliver Status</th>
+                                <th>Rate</th>
+                                <th>Review</th>
+                                <th></th>
                             </tr>
                         </thead>
                         <tbody>
-                            {orders.map((order, index) => (
+                            {reviews.map((review, index) => (
                                 <tr key={index}>
                                     <th>
                                         <label>
@@ -57,8 +55,8 @@ const page = () => {
                                             <div className="avatar sm:block hidden">
                                                 <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
                                                     <Image
-                                                        src={order.profilePic}
-                                                        alt={order.user}
+                                                        src={review.profilePic}
+                                                        alt={review.user}
                                                         width={50}
                                                         height={50}
                                                         className="object-cover"
@@ -66,30 +64,25 @@ const page = () => {
                                                 </div>
                                             </div>
                                             <div>
-                                                <div className="font-bold">{order.user}</div>
+                                                <div className="font-bold">{review.user}</div>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
                                         <div className="flex items-center gap-3">
                                             <div className="avatar sm:block hidden">
-                                                <Image src={order.image} alt={order.title} width={50} height={50} />
+                                                <Image src={review.productImage} alt={review.product} width={50} height={50} />
                                             </div>
                                             <div>
-                                                <div className="font-bold">{order.title}</div>
+                                                <div className="font-bold">{review.product}</div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>${order.price.toFixed(2)}</td>
-                                    <td>{order.available}</td>
-                                    <td>{order.quantity}</td>
-                                    <td>{order.sizes.join(', ')}</td>
-                                    <td >
-                                        <select className="select select-bordered select-sm w-full max-w-xs" defaultValue={order.deliverStatus}>
-                                            <option value='process'>process</option>
-                                            <option value='delivered'>delivered</option>
-                                            <option value="failed">failed</option>
-                                        </select>
+                                    <td>${review.rate.toFixed(2)}</td>
+                                    <td colSpan={2}>
+                                        <div className='max-h-20 overflow-y-auto'>
+                                            {review.review}
+                                        </div>
                                     </td>
                                 </tr>
                             ))}

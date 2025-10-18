@@ -229,3 +229,46 @@ export const orders = [
         deliverStatus: 'failed',
     }
 ];
+
+export const reviews = [
+    {
+        product: 'Adidas',
+        user: 'Sophia Turner',
+        rate: 4.8,
+        review: 'Really comfortable and stylish shoes! Perfect for running and daily wear.',
+        profilePic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        productImage: '/shoes/shoes1.png',
+    },
+    {
+        product: 'Puma',
+        user: 'Daniel Rivera',
+        rate: 4.2,
+        review: 'Good quality for the price. The fit is slightly tight but still great overall.',
+        profilePic: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        productImage: '/shoes/shoes2.png',
+    },
+    {
+        product: 'Nike',
+        user: 'Marcus Lee',
+        rate: 3.5,
+        review: 'Looks great but not very durable. The sole started wearing out sooner than expected.',
+        profilePic: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        productImage: '/shoes/shoes3.png',
+    },
+    {
+        product: 'Adidas',
+        user: 'Lily Chen',
+        rate: 5.0,
+        review: 'Absolutely love these! Lightweight, comfortable, and the design is amazing.',
+        profilePic: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        productImage: '/shoes/shoes1.png',
+    },
+    {
+        product: 'Puma',
+        user: 'Ethan Brown',
+        rate: 4.0,
+        review: 'Solid performance sneakers. Good grip and comfort during workouts.',
+        profilePic: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        productImage: '/shoes/shoes2.png',
+    },
+];
