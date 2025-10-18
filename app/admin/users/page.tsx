@@ -38,7 +38,11 @@ const page = () => {
                                 <th>User</th>
                                 <th>Email</th>
                                 <th>Address</th>
-                                <th>Status Online</th>
+                                <th>
+                                    <div className='flex flex-col items-center justify-center w-full'>
+                                        Status Online
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,22 +71,14 @@ const page = () => {
                                             </div>
                                         </div>
                                     </td>
-                                    <td>
-                                        {user.email}
-                                    </td>
-                                    <td>
-                                        {user.address}
-                                    </td>
-                                    <td className='w-full h-[5rem] flex justify-center items-center'>
-                                        {
-                                            user.status ? (
-                                                <div className='w-[0.8rem] h-[0.8rem] rounded-full bg-green-700' />
-                                            )
-                                                :
-                                                (
-                                                    <div className='w-[0.8rem] h-[0.8rem] rounded-full bg-red-700' />
-                                                )
-                                        }
+                                    <td>{user.email}</td>
+                                    <td>{user.address}</td>
+                                    <td className='flex items-center justify-center h-[5rem]'>
+                                        {user.status ? (
+                                            <div className='w-[0.8rem] h-[0.8rem] rounded-full bg-green-700' />
+                                        ) : (
+                                            <div className='w-[0.8rem] h-[0.8rem] rounded-full bg-red-700' />
+                                        )}
                                     </td>
                                 </tr>
                             ))}
