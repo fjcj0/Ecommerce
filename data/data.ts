@@ -147,7 +147,6 @@ export const cardsDashboard: cardDashboardProps[] = [
         isMoney: false,
     },
 ];
-
 export const topProducts: topProductProps[] = [
     {
         name: 'Nike',
