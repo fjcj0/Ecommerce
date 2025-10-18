@@ -173,7 +173,7 @@ export const products = [
         price: 80.5,
         sizes: ['XS', 'SM', 'M', 'L', 'XL'],
         image: '/shoes/shoes1.png',
-        available: 20,
+        available: 0,
         quantity: 30
     },
     {
@@ -326,6 +326,5 @@ export const sales = [
         price: 95.0,
         image: '/shoes/shoes3.png',
         date: '2024/5/5'
-
     }
 ];

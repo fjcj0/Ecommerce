@@ -25,7 +25,7 @@ const Sales = () => {
                             </div>
                             <div className='flex flex-col justify-center items-start'>
                                 <p className='font-raleway font-medium'>{sale.title}</p>
-                                <p className='font-medium text-sm text-primary/50'>{sale.date}</p>
+                                <p className='font-medium text-sm opacity-50 font-poppins'>{sale.date}</p>
                             </div>
                         </div>
                         <div>
