@@ -328,3 +328,68 @@ export const sales = [
         date: '2024/5/5'
     }
 ];
+export const userOrders = [
+    {
+        title: 'Adidas',
+        price: 80.5,
+        sizes: ['XS', 'SM', 'M', 'L', 'XL'],
+        image: '/shoes/shoes1.png',
+        deliverStatus: 'delivered',
+    },
+    {
+        title: 'Puma',
+        price: 70.0,
+        sizes: ['S', 'M', 'L'],
+        image: '/shoes/shoes2.png',
+        deliverStatus: 'process',
+    },
+    {
+        title: 'Nike',
+        price: 95.0,
+        sizes: ['M', 'L', 'XL'],
+        image: '/shoes/shoes3.png',
+        deliverStatus: 'failed',
+    }
+];
+export const checkouts = [
+    {
+        title: 'Nike',
+        image: '/shoes/shoes1.png',
+        quantity: 1,
+        discount: 20.3,
+        sizes: [
+            {
+                size: 'XL',
+                selected: true,
+            },
+            {
+                size: 'L',
+                selected: false,
+            },
+        ],
+    },
+    {
+        title: 'Adidas',
+        image: '/shoes/shoes2.png',
+        quantity: 1,
+        discount: 15,
+        sizes: [
+            {
+                size: 'M',
+                selected: true,
+            },
+        ],
+    },
+    {
+        title: 'Puma',
+        image: '/shoes/shoes3.png',
+        quantity: 1,
+        discount: 10,
+        sizes: [
+            {
+                size: 'S',
+                selected: true,
+            },
+        ],
+    },
+];

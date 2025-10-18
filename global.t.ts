@@ -34,3 +34,9 @@ export interface productsProps {
     available: number;
     quantity: number;
 }
+export interface checkoutsProps {
+    title: string;
+    image: string;
+    quantity: number;
+    sizes: any[];
+}

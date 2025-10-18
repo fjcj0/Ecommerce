@@ -1,6 +1,6 @@
 import React from 'react';
-import { Trash, Edit } from 'lucide-react';
-import { orders, products } from '@/data/data';
+import { Trash } from 'lucide-react';
+import { orders } from '@/data/data';
 import Image from 'next/image';
 const page = () => {
     return (
