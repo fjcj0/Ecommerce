@@ -229,7 +229,6 @@ export const orders = [
         deliverStatus: 'failed',
     }
 ];
-
 export const reviews = [
     {
         product: 'Adidas',
@@ -270,5 +269,42 @@ export const reviews = [
         review: 'Solid performance sneakers. Good grip and comfort during workouts.',
         profilePic: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
         productImage: '/shoes/shoes2.png',
+    },
+];
+export const users = [
+    {
+        name: 'Sophia Turner',
+        profilePic: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        email: 'sophia.turner@example.com',
+        address: '123 Maple Street, Springfield, IL, 62704',
+        status: true,
+    },
+    {
+        name: 'Daniel Rivera',
+        profilePic: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        email: 'daniel.rivera@example.com',
+        address: '456 Oak Avenue, Austin, TX, 73301',
+        status: false,
+    },
+    {
+        name: 'Marcus Lee',
+        profilePic: 'https://images.unsplash.com/photo-1506277886164-e25aa3f4ef7f?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        email: 'marcus.lee@example.com',
+        address: '789 Pine Road, Seattle, WA, 98101',
+        status: true,
+    },
+    {
+        name: 'Lily Chen',
+        profilePic: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        email: 'lily.chen@example.com',
+        address: '321 Cedar Lane, San Francisco, CA, 94102',
+        status: false,
+    },
+    {
+        name: 'Ethan Brown',
+        profilePic: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-4.1.0&auto=format&fit=crop&q=60&w=800',
+        email: 'ethan.brown@example.com',
+        address: '654 Birch Boulevard, Miami, FL, 33101',
+        status: true,
     },
 ];
