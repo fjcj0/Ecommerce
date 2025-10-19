@@ -10,8 +10,8 @@ import {
 } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import { checkConnection } from "@/utils/checkConnection";
 import { ApplyTheme } from "./components/ApplyTheme";
+import { AuthProvider } from "./context/authContext";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -55,26 +55,27 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  checkConnection();
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`
-            ${geistSans.variable} 
-            ${geistMono.variable} 
-            ${playfair.variable} 
-            ${poppins.variable} 
-            ${raleway.variable} 
-            ${greatVibes.variable} 
-            ${inter.variable} 
-            overflow-x-hidden
-          `}
-        >
-          <ApplyTheme />
-          {children}
-        </body>
-      </html>
+      <AuthProvider>
+        <html lang="en">
+          <body
+            className={`
+              ${geistSans.variable} 
+              ${geistMono.variable} 
+              ${playfair.variable} 
+              ${poppins.variable} 
+              ${raleway.variable} 
+              ${greatVibes.variable} 
+              ${inter.variable} 
+              overflow-x-hidden
+            `}
+          >
+            <ApplyTheme />
+            {children}
+          </body>
+        </html>
+      </AuthProvider>
     </ClerkProvider>
   );
 }

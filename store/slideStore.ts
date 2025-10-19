@@ -1,12 +1,10 @@
 import { create } from "zustand";
-
 type SlideState = {
     isSlideOpen: boolean;
     openSlide: () => void;
     closeSlide: () => void;
     toggleSlide: () => void;
 };
-
 const getInitialSlideState = (): boolean => {
     if (typeof window !== "undefined") {
         const stored = localStorage.getItem("isSlideOpen");
@@ -14,7 +12,6 @@ const getInitialSlideState = (): boolean => {
     }
     return true;
 };
-
 const useSlideStore = create<SlideState>((set) => ({
     isSlideOpen: getInitialSlideState(),
     openSlide: () =>
@@ -34,5 +31,4 @@ const useSlideStore = create<SlideState>((set) => ({
             return { isSlideOpen: newState };
         }),
 }));
-
 export default useSlideStore;

@@ -1,11 +1,12 @@
 "use client";
 import React from "react";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, useAuth, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import Link from "next/link";
 import { ShoppingBagIcon } from "lucide-react";
 import ThemeSelector from "./ThemeSelector";
 import { links } from "@/data/data";
+import useAuthStore from "@/store/authStore";
 const Header = () => {
     const handleScroll = (sectionId: string) => {
         const element = document.getElementById(sectionId);

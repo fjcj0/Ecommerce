@@ -1,4 +1,5 @@
 import { LucideIcon } from "lucide-react";
+export const baseUrl = 'http://localhost:3000';
 export interface cardProps {
     name: string;
     image: string;
@@ -46,4 +47,10 @@ export interface userReviewsProps {
     rating: number;
     review: string;
     user: string;
+}
+export interface userProps {
+    id: number;
+    email: string;
+    displayName: string;
+    profilePicture: string;
 }
