@@ -10,21 +10,35 @@ export async function POST(request: NextRequest) {
                 { status: 401 }
             );
         }
-        const isExists = await sql`
+        const existingUser = await sql`
             SELECT * FROM users WHERE email = ${email};
         `;
-        if (isExists.length > 0) {
-            return NextResponse.json({
-                user: isExists[0]
-            }, { status: 200 });
+        if (existingUser.length > 0) {
+            const user = existingUser[0];
+            if (user.profilePicture !== imageUrl) {
+                const updatedUser = await sql`
+                    UPDATE users
+                    SET profilePicture = ${imageUrl}, updated_at = NOW()
+                    WHERE email = ${email}
+                    RETURNING *;
+                `;
+                return NextResponse.json(
+                    { user: updatedUser[0] },
+                    { status: 200 }
+                );
+            }
+            return NextResponse.json(
+                { user },
+                { status: 200 }
+            );
         }
-        const created_User = await sql`
+        const createdUser = await sql`
             INSERT INTO users(email, displayName, profilePicture, created_at, updated_at)
             VALUES (${email}, ${fullName}, ${imageUrl || '/'}, NOW(), NOW())
             RETURNING *;
         `;
         return NextResponse.json(
-            { user: created_User[0] },
+            { user: createdUser[0] },
             { status: 200 }
         );
     } catch (error) {

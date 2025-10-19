@@ -1,36 +1,37 @@
 import { neon } from '@neondatabase/serverless';
 import { NextResponse } from 'next/server';
 export async function GET() {
-    try {
-        const sql = neon(process.env.NEXT_PUBLIC_POSTGRESS_API!);
-        await sql`
+  try {
+    const sql = neon(process.env.NEXT_PUBLIC_POSTGRESS_API!);
+    await sql`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
-        displayName TEXT,
-        profilePicture TEXT,
+        displayname TEXT,
+        profilepicture TEXT,
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `;
-        await sql`
-      CREATE TABLE IF NOT EXISTS shoes (
-        id SERIAL PRIMARY KEY,
-        title TEXT NOT NULL,
-        description TEXT,
-        available INTEGER DEFAULT 0,
-        xs BOOLEAN DEFAULT FALSE,
-        s BOOLEAN DEFAULT FALSE,
-        m BOOLEAN DEFAULT FALSE,
-        l BOOLEAN DEFAULT FALSE,
-        xl BOOLEAN DEFAULT FALSE,
-        discount DECIMAL(5,2) DEFAULT 0.00,
-        quantity INTEGER DEFAULT 0,
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW()
-      );
-    `;
-        await sql`
+    await sql`
+  CREATE TABLE IF NOT EXISTS shoes (
+    id SERIAL PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    available INTEGER DEFAULT 0,
+    xs BOOLEAN DEFAULT FALSE,
+    s BOOLEAN DEFAULT FALSE,
+    m BOOLEAN DEFAULT FALSE,
+    l BOOLEAN DEFAULT FALSE,
+    xl BOOLEAN DEFAULT FALSE,
+    discount DECIMAL(5,2), -- allow NULL by removing DEFAULT 0.00
+    ends_in TIMESTAMP,     -- new column, can be NULL
+    quantity INTEGER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+`;
+    await sql`
       CREATE TABLE IF NOT EXISTS images (
         id SERIAL PRIMARY KEY,
         shoe_id INTEGER REFERENCES shoes(id) ON DELETE CASCADE,
@@ -39,7 +40,7 @@ export async function GET() {
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `;
-        await sql`
+    await sql`
       CREATE TABLE IF NOT EXISTS reviews (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -50,7 +51,7 @@ export async function GET() {
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `;
-        await sql`
+    await sql`
       CREATE TABLE IF NOT EXISTS checkouts (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -62,7 +63,7 @@ export async function GET() {
         UNIQUE (user_id, shoe_id, size)
       );
     `;
-        await sql`
+    await sql`
       CREATE TABLE IF NOT EXISTS orders (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -76,7 +77,7 @@ export async function GET() {
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `;
-        await sql`
+    await sql`
       CREATE TABLE IF NOT EXISTS sales (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -88,7 +89,7 @@ export async function GET() {
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `;
-        await sql`
+    await sql`
       CREATE TABLE IF NOT EXISTS addresses (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -101,17 +102,16 @@ export async function GET() {
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `;
-
-        console.log('✅ All tables created or already exist.');
-        return NextResponse.json({
-            success: true,
-            message: '✅ All tables created successfully (or already exist).',
-        });
-    } catch (error) {
-        console.error('❌ Database setup error:', error);
-        return NextResponse.json({
-            success: false,
-            error: error instanceof Error ? error.message : String(error),
-        });
-    }
+    console.log('All tables created or already exist!!');
+    return NextResponse.json({
+      success: true,
+      message: 'All tables created successfully (or already exist)!!',
+    });
+  } catch (error) {
+    console.error('❌ Database setup error:', error);
+    return NextResponse.json({
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }

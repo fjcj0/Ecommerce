@@ -51,6 +51,6 @@ export interface userReviewsProps {
 export interface userProps {
     id: number;
     email: string;
-    displayName: string;
-    profilePicture: string;
+    displayname: string;
+    profilepicture: string;
 }

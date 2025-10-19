@@ -3,7 +3,9 @@ import { product } from '@/data/data';
 import Image from 'next/image';
 import { userReviews } from '@/data/data';
 import Reviews from '../../components/Reviews';
+import Comment from '../../components/Comment';
 const page = () => {
+    const isAuthCommented: boolean = true;
     return (
         <div className="p-3 flex flex-col gap-14">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 bg-base-300 p-5 rounded-3xl">
@@ -77,6 +79,13 @@ const page = () => {
                     User <span className="font-bold">Reviews</span>
                 </h1>
                 <div className="flex flex-col gap-5 max-h-[50rem] overflow-y-auto items-start justify-start w-full">
+                    {
+                        isAuthCommented ?
+                            <Comment />
+                            :
+                            <div>No</div>
+
+                    }
                     {userReviews.map((userReview, index) => (
                         <Reviews
                             key={index}
