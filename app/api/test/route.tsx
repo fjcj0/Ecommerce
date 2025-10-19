@@ -13,17 +13,104 @@ export async function GET() {
         updated_at TIMESTAMP DEFAULT NOW()
       );
     `;
-        console.log('Connected successfully!');
+        await sql`
+      CREATE TABLE IF NOT EXISTS shoes (
+        id SERIAL PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT,
+        available INTEGER DEFAULT 0,
+        xs BOOLEAN DEFAULT FALSE,
+        s BOOLEAN DEFAULT FALSE,
+        m BOOLEAN DEFAULT FALSE,
+        l BOOLEAN DEFAULT FALSE,
+        xl BOOLEAN DEFAULT FALSE,
+        discount DECIMAL(5,2) DEFAULT 0.00,
+        quantity INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+        await sql`
+      CREATE TABLE IF NOT EXISTS images (
+        id SERIAL PRIMARY KEY,
+        shoe_id INTEGER REFERENCES shoes(id) ON DELETE CASCADE,
+        url TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+        await sql`
+      CREATE TABLE IF NOT EXISTS reviews (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        shoe_id INTEGER REFERENCES shoes(id) ON DELETE CASCADE,
+        rating INTEGER CHECK (rating >= 1 AND rating <= 5),
+        comment TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+        await sql`
+      CREATE TABLE IF NOT EXISTS checkouts (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        shoe_id INTEGER REFERENCES shoes(id) ON DELETE CASCADE,
+        size TEXT CHECK (size IN ('XS','S','M','L','XL')),
+        quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW(),
+        UNIQUE (user_id, shoe_id, size)
+      );
+    `;
+        await sql`
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        shoe_id INTEGER REFERENCES shoes(id) ON DELETE SET NULL,
+        size TEXT CHECK (size IN ('XS','S','M','L','XL')) NOT NULL,
+        quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+        total_amount DECIMAL(10,2),
+        price DECIMAL(10,2),
+        status TEXT DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+        await sql`
+      CREATE TABLE IF NOT EXISTS sales (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        shoe_id INTEGER REFERENCES shoes(id),
+        order_id INTEGER REFERENCES orders(id) ON DELETE CASCADE,
+        quantity INTEGER DEFAULT 1,
+        price DECIMAL(10,2),
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+        await sql`
+      CREATE TABLE IF NOT EXISTS addresses (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+        street TEXT,
+        city TEXT,
+        state TEXT,
+        zip TEXT,
+        country TEXT,
+        created_at TIMESTAMP DEFAULT NOW(),
+        updated_at TIMESTAMP DEFAULT NOW()
+      );
+    `;
+
+        console.log('✅ All tables created or already exist.');
         return NextResponse.json({
             success: true,
-            connected: true,
-            message: 'Users table created or already exists (with updated_at trigger).',
+            message: '✅ All tables created successfully (or already exist).',
         });
     } catch (error) {
-        console.error('Database error:', error);
+        console.error('❌ Database setup error:', error);
         return NextResponse.json({
             success: false,
-            connected: false,
             error: error instanceof Error ? error.message : String(error),
         });
     }

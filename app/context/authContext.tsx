@@ -11,9 +11,11 @@ type AuthContextType = {
 };
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    checkConnection();
     const { user } = useUser();
     const { signIn, user: authUser, isLoading, error, logout } = useAuthStore();
+    useEffect(() => {
+        checkConnection();
+    }, []);
     useEffect(() => {
         if (user) {
             const email = user.emailAddresses[0]?.emailAddress;
