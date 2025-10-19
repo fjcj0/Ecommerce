@@ -40,3 +40,10 @@ export interface checkoutsProps {
     quantity: number;
     sizes: any[];
 }
+export interface userReviewsProps {
+    isOdd: boolean;
+    profilePicture: string;
+    rating: number;
+    review: string;
+    user: string;
+}
