@@ -71,4 +71,6 @@ export interface adminDashboardInformationProps {
     totalOrdersDelivered: number;
     percentAgeOfOrders: number;
     topProducts: topTenProductProps[];
+    productsPerMonth: any;
+    salesPerMonth?: { month: string; total: number }[];
 }

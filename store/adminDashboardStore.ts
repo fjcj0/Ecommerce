@@ -11,6 +11,8 @@ type AdminDashboardState = {
     totalOrdersDelivered: number;
     percentAgeOfOrders: number;
     topProducts: topTenProductProps[];
+    productsPerMonth: any;
+    salesPerMonth: any;
     getDashboardInformation: () => Promise<void>;
 };
 const useAdminDashboardInfoStore = create<AdminDashboardState>((set, get) => ({
@@ -23,6 +25,8 @@ const useAdminDashboardInfoStore = create<AdminDashboardState>((set, get) => ({
     totalOrdersDelivered: 0,
     percentAgeOfOrders: 0,
     topProducts: [],
+    productsPerMonth: [],
+    salesPerMonth: [],
     getDashboardInformation: async () => {
         set({ isLoading: true });
         try {
@@ -36,6 +40,8 @@ const useAdminDashboardInfoStore = create<AdminDashboardState>((set, get) => ({
                 totalOrdersDelivered: data.totalOrdersDelivered,
                 percentAgeOfOrders: data.percentAgeOfOrders,
                 topProducts: data.topProducts,
+                productsPerMonth: data.productsPerMonth,
+                salesPerMonth: data.salesPerMonth
             });
         } catch (error: unknown) {
             set({ error: error instanceof Error ? error.message : error })

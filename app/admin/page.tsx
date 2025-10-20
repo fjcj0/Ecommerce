@@ -7,14 +7,14 @@ import TopProduct from "./components/TopProduct";
 import useAdminDashboardInfoStore from "@/store/adminDashboardStore";
 import { DollarSign, Box, Users, ListOrderedIcon } from 'lucide-react';
 const Page = () => {
-    const { getDashboardInformation, totalOrders, totalOrdersDelivered, percentAgeOfOrders, totalUsers, topProducts, totalProducts, isLoading } = useAdminDashboardInfoStore();
+    const { getDashboardInformation, totalOrders, totalOrdersDelivered, percentAgeOfOrders, totalUsers, topProducts, totalProducts, isLoading, productsPerMonth, salesPerMonth } = useAdminDashboardInfoStore();
     useEffect(() => {
         getDashboardInformation();
     }, []);
     const cardsDashboard = [
         {
             icon: DollarSign,
-            title: "Total Sales",
+            title: "Profits",
             value: useAdminDashboardInfoStore.getState().sumOfSales,
             isMoney: true,
 
@@ -33,8 +33,8 @@ const Page = () => {
         },
         {
             icon: ListOrderedIcon,
-            title: "Orders Delivered",
-            value: percentAgeOfOrders,
+            title: "Total Orders Delivered",
+            value: totalOrdersDelivered,
             isMoney: false,
         },
     ];
@@ -62,21 +62,28 @@ const Page = () => {
                     <div className="flex w-full font-bold items-start justify-start">
                         <p className="text-primary bg-primary/30 px-3 py-1 rounded-lg ">Sales Last 9 Months</p>
                     </div>
-                    <SalesChart />
+                    <SalesChart data={salesPerMonth} />
                 </div>
                 <div className="w-full bg-base-300 flex flex-col items-center justify-center p-3 gap-5 rounded-xl">
                     <div className="flex w-full font-bold items-start justify-start">
                         <p className="text-primary bg-primary/30 px-3 py-1 rounded-lg ">Products Last 9 Months</p>
                     </div>
-                    <ProductsChart />
+                    <ProductsChart data={productsPerMonth} />
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-5 w-full gap-5">
                 <div className="col-span-3 font-raleway">
                     <div className="w-full flex flex-col justify-start items-start gap-3 h-full bg-base-300 rounded-lg p-3">
-                        <h1 className="font-bold">Total Order Delivered</h1>
+                        <h1 className="font-bold">percentAgeOfOrders</h1>
                         <div className="w-full flex items-center justify-center h-full">
-                            <div className="radial-progress text-primary text-5xl font-bold" style={{ "--value": 70, "--size": "13rem" }} role="progressbar">
+                            <div
+                                className="radial-progress text-primary text-5xl font-bold"
+                                style={{
+                                    "--value": percentAgeOfOrders.toFixed(0),
+                                    "--size": "13rem",
+                                } as React.CSSProperties}
+                                role="progressbar"
+                            >
                                 {percentAgeOfOrders.toFixed(2)}%
                             </div>
                         </div>
@@ -100,7 +107,7 @@ const Page = () => {
                                         />
                                     ))
                                 ) : (
-                                    <p>No shoes yet!!</p>
+                                    <p>No shoes sold yet!!</p>
                                 )
                             }
                         </div>

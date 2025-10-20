@@ -1,8 +1,11 @@
 "use client";
-import { useEffect, useRef } from 'react';
-import { Chart, registerables } from 'chart.js';
+import { useEffect, useRef } from "react";
+import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
-const ProductsChart: React.FC = () => {
+interface ProductsChartProps {
+    data: { month: string; total: number }[];
+}
+const ProductsChart: React.FC<ProductsChartProps> = ({ data }) => {
     const chartRef = useRef<HTMLCanvasElement | null>(null);
     const chartInstance = useRef<Chart | null>(null);
     useEffect(() => {
@@ -13,16 +16,19 @@ const ProductsChart: React.FC = () => {
             }
         };
         if (chartRef.current) {
-            const ctx = chartRef.current.getContext('2d');
+            const ctx = chartRef.current.getContext("2d");
             if (ctx) {
+                const defaultLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep"];
+                const chartLabels = data && data.length > 0 ? data.map(d => d.month) : defaultLabels;
+                const chartValues = data && data.length > 0 ? data.map(d => d.total) : Array(defaultLabels.length).fill(0);
                 const chartData = {
-                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+                    labels: chartLabels,
                     datasets: [
                         {
-                            label: 'Products Added',
-                            data: [2, 5, 7, 10, 12, 15, 18, 22, 30],
-                            backgroundColor: '#FF6347',
-                            borderColor: '#FF6347',
+                            label: "Products Added",
+                            data: chartValues,
+                            backgroundColor: "#FF6347",
+                            borderColor: "#FF6347",
                             borderWidth: 1,
                             borderRadius: { topLeft: 10, topRight: 10 },
                         },
@@ -30,41 +36,27 @@ const ProductsChart: React.FC = () => {
                 };
                 const chartOptions = {
                     responsive: true,
-                    plugins: {
-                        legend: {
-                            display: false,
-                        },
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            grid: {
-                                display: false,
-                            },
-                        },
+                        x: { grid: { display: false } },
                         y: {
                             beginAtZero: true,
-                            ticks: {
-                                stepSize: 5,
-                            },
-                            grid: {
-                                display: false,
-                            },
-                            border: {
-                                display: false,
-                            },
+                            ticks: { stepSize: 5 },
+                            grid: { display: false },
+                            border: { display: false },
                         },
                     },
                 };
                 destroyChart();
                 chartInstance.current = new Chart(ctx, {
-                    type: 'bar',
+                    type: "bar",
                     data: chartData,
                     options: chartOptions,
                 });
             }
         }
         return () => destroyChart();
-    }, []);
+    }, [data]);
     return <canvas ref={chartRef} />;
 };
 export default ProductsChart;
