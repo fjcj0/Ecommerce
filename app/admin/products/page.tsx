@@ -1,10 +1,40 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Trash, Edit } from 'lucide-react';
-import { products } from '@/data/data';
 import Image from 'next/image';
 import ModalEditProduct from '../components/ModalEditProduct';
-const page = () => {
+import useProductAdmin from '@/store/productStore';
+const Page = () => {
+    const { products, getProducts, isLoading } = useProductAdmin();
+    const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
+    const [allSelected, setAllSelected] = useState(false);
+    useEffect(() => {
+        getProducts();
+    }, []);
+    useEffect(() => {
+        if (products) {
+            setSelectedRows(new Array(products.length).fill(false));
+        }
+    }, [products]);
+    const handleSelectAll = () => {
+        const newValue = !allSelected;
+        setAllSelected(newValue);
+        setSelectedRows(new Array(products.length).fill(newValue));
+    };
+    const handleRowSelect = (index: number) => {
+        const updatedRows = [...selectedRows];
+        updatedRows[index] = !updatedRows[index];
+        setSelectedRows(updatedRows);
+        setAllSelected(updatedRows.every(Boolean));
+    };
+
+    if (isLoading) {
+        return (
+            <div className="w-full h-[80%] flex items-center justify-center">
+                <span className="loading loading-infinity loading-lg"></span>
+            </div>
+        );
+    }
     return (
         <div className='p-3 font-poppins h-full flex flex-col items-start justify-start gap-5'>
             <div className='w-full flex justify-between items-center'>
@@ -30,17 +60,23 @@ const page = () => {
                         dialog?.showModal();
                     }}
                     ><Edit size={23} /></button>
+
                     <ModalEditProduct />
                 </div>
             </div>
             <div className='w-full flex items-start justify-center'>
                 <div className="overflow-x-auto w-full">
-                    <table className="table ">
+                    <table className="table">
                         <thead>
                             <tr>
                                 <th>
                                     <label>
-                                        <input type="checkbox" className="checkbox" />
+                                        <input
+                                            type="checkbox"
+                                            className="checkbox"
+                                            checked={allSelected}
+                                            onChange={handleSelectAll}
+                                        />
                                     </label>
                                 </th>
                                 <th>Product</th>
@@ -52,30 +88,49 @@ const page = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {products.map((product, index) => (
-                                <tr key={index}>
-                                    <th>
-                                        <label>
-                                            <input type="checkbox" className="checkbox" />
-                                        </label>
-                                    </th>
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="avatar sm:block hidden">
-                                                <Image src={product.image} alt={product.title} width={50} height={50} />
-                                            </div>
-                                            <div>
-                                                <div className="font-bold">{product.title}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>${product.price.toFixed(2)}</td>
-                                    <td>{product.available}</td>
-                                    <td>{product.quantity}</td>
-                                    <td>{product.sizes.join(', ')}</td>
-                                    <td> <input type="checkbox" className="toggle" defaultChecked /></td>
-                                </tr>
-                            ))}
+                            {
+                                !products || products.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={7} className="text-center">No products!!</td>
+                                    </tr>
+                                ) : (
+                                    products.map((product: any, index: number) => (
+                                        <tr key={index}>
+                                            <th>
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        className="checkbox"
+                                                        checked={selectedRows[index] || false}
+                                                        onChange={() => handleRowSelect(index)}
+                                                    />
+                                                </label>
+                                            </th>
+                                            <td>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="avatar sm:block hidden">
+                                                        <Image src={product.images[0]} alt={product.title} width={50} height={50} />
+                                                    </div>
+                                                    <div>
+                                                        <div className="font-bold">{product.title}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{product.price}</td>
+                                            <td>{product.available}</td>
+                                            <td>{product.quantity}</td>
+                                            <td>
+                                                {['XS', 'S', 'M', 'L', 'XL']
+                                                    .filter(size => product[size.toLowerCase()])
+                                                    .join(', ')}
+                                            </td>
+                                            <td>
+                                                <input type="checkbox" className="toggle" defaultChecked={product.is_visible} />
+                                            </td>
+                                        </tr>
+                                    ))
+                                )
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -89,4 +144,4 @@ const page = () => {
         </div>
     );
 }
-export default page;
+export default Page;
