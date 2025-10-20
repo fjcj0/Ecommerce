@@ -74,3 +74,17 @@ export interface adminDashboardInformationProps {
     productsPerMonth: any;
     salesPerMonth?: { month: string; total: number }[];
 }
+export interface imagesStateProps {
+    image1: string | null;
+    image2: string | null;
+    image3: string | null;
+    image4: string | null;
+    image5: string | null;
+}
+export interface sizesStateProps {
+    xs: boolean;
+    s: boolean;
+    m: boolean;
+    l: boolean;
+    xl: boolean;
+}
