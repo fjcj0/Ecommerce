@@ -88,3 +88,22 @@ export interface sizesStateProps {
     l: boolean;
     xl: boolean;
 }
+export interface updateProductsProps {
+    sizesChosen: boolean[];
+    quantity: number;
+    discount: number;
+    title: string;
+    price: number;
+    endsIn: string;
+    description: string;
+}
+export interface createProductProps {
+    imagesAddedBase64: any;
+    sizesChosen: sizesStateProps;
+    quantity: number;
+    discount: number;
+    title: string;
+    price: number;
+    endsIn: string;
+    description: string;
+}

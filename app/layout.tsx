@@ -12,6 +12,7 @@ import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ApplyTheme } from "./components/ApplyTheme";
 import { AuthProvider } from "./context/authContext";
+import { Toaster } from "react-hot-toast";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -71,6 +72,7 @@ export default function RootLayout({
               overflow-x-hidden
             `}
           >
+            <Toaster />
             <ApplyTheme />
             {children}
           </body>

@@ -3,6 +3,8 @@ import React, { useState, ChangeEvent } from 'react';
 import { Image, X } from 'lucide-react';
 import { baseUrl, imagesStateProps, sizesStateProps } from '@/global.t';
 import axios from 'axios';
+import useProductAdmin from '@/store/productStore';
+import toast from 'react-hot-toast';
 const Page = () => {
     const sizes = ['XS', 'S', 'M', 'L', 'XL'];
     const today = new Date();
@@ -31,9 +33,9 @@ const Page = () => {
         image5: null
     });
     const [title, setTitle] = useState('');
-    const [price, setPrice] = useState('');
-    const [quantity, setQuantity] = useState('');
-    const [discount, setDiscount] = useState('');
+    const [price, setPrice] = useState<string>('');
+    const [quantity, setQuantity] = useState<string>('');
+    const [discount, setDiscount] = useState<string>('');
     const [endsIn, setEndsIn] = useState('');
     const [description, setDescription] = useState('');
     const handleImageChange = (e: ChangeEvent<HTMLInputElement>, index: number) => {
@@ -44,42 +46,89 @@ const Page = () => {
         reader.onloadend = async () => {
             const imageBase64 = reader.result as string;
             try {
-                setImagesLoading((prev) => ({ ...prev, [imageKey]: true }));
+                setImagesLoading(prev => ({ ...prev, [imageKey]: true }));
                 const response = await axios.post(`${baseUrl}/api/upload-picture`, { imageBase64 });
-                setImagesAddedBase64((prev) => ({
+                setImagesAddedBase64(prev => ({
                     ...prev,
                     [imageKey]: response?.data?.imageUrl || imageBase64
                 }));
             } catch (error: unknown) {
                 console.log('Error uploading image:', error instanceof Error ? error.message : error);
             } finally {
-                setImagesLoading((prev) => ({ ...prev, [imageKey]: false }));
+                setImagesLoading(prev => ({ ...prev, [imageKey]: false }));
             }
         };
         reader.readAsDataURL(file);
     };
     const removeImage = (index: number) => {
-        setImagesAddedBase64((prev) => ({
-            ...prev,
-            [`image${index + 1}`]: null
-        }));
+        const imageKey = `image${index + 1}` as keyof imagesStateProps;
+        setImagesAddedBase64(prev => ({ ...prev, [imageKey]: null }));
     };
     const toggleSize = (size: string) => {
-        setSizesChosen((prev) => ({
+        setSizesChosen(prev => ({
             ...prev,
             [size.toLowerCase()]: !prev[size.toLowerCase() as keyof sizesStateProps]
         }));
     };
-    console.log({
-        title,
-        price,
-        quantity,
-        discount,
-        endsIn,
-        description,
-        sizesChosen,
-        imagesAddedBase64
-    });
+    const { createProduct, isLoading } = useProductAdmin();
+    const onCreate = async () => {
+        try {
+            const hasImages = Object.values(imagesAddedBase64).some(img => img !== null);
+            const hasSizes = Object.values(sizesChosen).some(selected => selected);
+            if (!title.trim()) {
+                toast.error("Title is required");
+                return;
+            }
+            if (!price || parseFloat(price) <= 0) {
+                toast.error("Price must be greater than 0");
+                return;
+            }
+            if (!quantity || parseInt(quantity) <= 0) {
+                toast.error("Quantity must be greater than 0");
+                return;
+            }
+            if (!hasImages) {
+                toast.error("At least one image is required");
+                return;
+            }
+            if (!hasSizes) {
+                toast.error("Select at least one size");
+                return;
+            }
+            await createProduct({
+                imagesAddedBase64,
+                sizesChosen,
+                quantity: parseInt(quantity) || 0,
+                discount: parseFloat(discount) || 0,
+                title,
+                price: parseFloat(price) || 0,
+                endsIn,
+                description
+            });
+            setImagesAddedBase64({
+                image1: null,
+                image2: null,
+                image3: null,
+                image4: null,
+                image5: null
+            });
+            setSizesChosen({
+                xs: false,
+                s: false,
+                m: false,
+                l: false,
+                xl: false
+            });
+            setTitle('');
+            setPrice('');
+            setQuantity('');
+            setDescription('');
+            setDiscount('');
+            setEndsIn('');
+        } catch (error: unknown) {
+            toast.error(error instanceof Error ? error.message : String(error));
+        }
+    };
     return (
         <div className='p-3 w-full flex flex-col justify-start items-start'>
             <div className='flex flex-col gap-3 w-full items-start justify-start'>
@@ -91,12 +140,12 @@ const Page = () => {
                         const isLoading = imagesLoading[imageKey];
                         return (
                             <div key={index} className='relative w-full h-[20rem]'>
-                                {imageSrc ? (
+                                {imageSrc !== null ? (
                                     <>
                                         <img
                                             src={imageSrc}
                                             alt={`uploaded ${index + 1}`}
-                                            className='w-full h-full object-cover rounded-xl'
+                                            className='w-full h-full object-contain rounded-xl'
                                         />
                                         <button
                                             type='button'
@@ -137,29 +186,29 @@ const Page = () => {
                             onChange={(e) => setTitle(e.target.value)}
                         />
                         <input
-                            type='number'
-                            step='0.01'
-                            min='0'
-                            className='input input-bordered'
-                            placeholder='price...'
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            className="input input-bordered"
+                            placeholder="price..."
                             value={price}
                             onChange={(e) => setPrice(e.target.value)}
                         />
                         <input
-                            type='number'
-                            step='1'
-                            min='0'
-                            className='input input-bordered'
-                            placeholder='quantity...'
+                            type="number"
+                            step="1"
+                            min="0"
+                            className="input input-bordered"
+                            placeholder="quantity..."
                             value={quantity}
                             onChange={(e) => setQuantity(e.target.value)}
                         />
                         <input
-                            type='number'
-                            step='0.01'
-                            min='0'
-                            className='input input-bordered'
-                            placeholder='discount...'
+                            type="number"
+                            step="0.01"
+                            min="0"
+                            className="input input-bordered"
+                            placeholder="discount..."
                             value={discount}
                             onChange={(e) => setDiscount(e.target.value)}
                         />
@@ -193,9 +242,16 @@ const Page = () => {
                     </div>
                     <button
                         type='button'
-                        className='font-bold px-4 py-2 text-primary border border-primary/50 rounded-lg hover:bg-primary/50'
+                        className={`font-bold px-4 py-2 text-primary border border-primary/50 rounded-lg hover:bg-primary/50
+                         ${isLoading ? 'opacity-50' : ''}`}
+                        disabled={isLoading}
+                        onClick={onCreate}
                     >
-                        Create
+                        {
+                            isLoading ?
+                                <span className=' loading loading-infinity loading-md'></span>
+                                : "Create"
+                        }
                     </button>
                 </div>
             </div>

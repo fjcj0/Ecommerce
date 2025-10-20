@@ -17,6 +17,7 @@ export async function GET() {
   CREATE TABLE IF NOT EXISTS shoes (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
+    price DECIMAL,
     description TEXT,
     available INTEGER DEFAULT 0,
     xs BOOLEAN DEFAULT FALSE,

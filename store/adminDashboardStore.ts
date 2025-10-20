@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import axios from "axios";
 import { topTenProductProps, baseUrl } from "@/global.t";
-type AdminDashboardState = {
+type adminDashboardProps = {
     error: null | string | unknown;
     isLoading: boolean;
     sumOfSales: number;
@@ -15,7 +15,7 @@ type AdminDashboardState = {
     salesPerMonth: any;
     getDashboardInformation: () => Promise<void>;
 };
-const useAdminDashboardInfoStore = create<AdminDashboardState>((set, get) => ({
+const useAdminDashboardInfoStore = create<adminDashboardProps>((set, get) => ({
     error: null,
     isLoading: false,
     sumOfSales: 0,
