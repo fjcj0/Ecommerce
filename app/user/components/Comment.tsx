@@ -1,10 +1,8 @@
 "use client";
 import useAuthStore from '@/store/authStore';
-import { useUser } from '@clerk/nextjs';
 import { Edit3Icon } from 'lucide-react';
 import React from 'react';
 const Comment = () => {
-    const { user } = useUser();
     const { user: authUser } = useAuthStore();
     if (!authUser) return null;
     return (
@@ -22,7 +20,6 @@ const Comment = () => {
                 />
             </div>
             <div className="flex flex-col gap-5">
-
                 <h1 className="text-2xl font-bold font-raleway">{authUser.displayname}</h1>
                 <p className="font-raleway">"These shoes are super comfortable and stylish!"</p>
                 <div className="flex items-center gap-3">

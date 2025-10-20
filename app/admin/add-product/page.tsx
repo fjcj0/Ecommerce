@@ -32,15 +32,12 @@ const Page = () => {
                             <input type='number' step='0.01' min='0' className='input input-bordered' placeholder='price...' />
                             <input type='number' className='input input-bordered' placeholder='quantity...' />
                             <input type='number' step='0.01' min='0' className='input input-bordered' placeholder='discount...' />
-
-                            {/* ✅ Only allow dates after today */}
                             <input
                                 type='date'
                                 className='input input-bordered h-[8rem]'
                                 placeholder='Discount end...'
                                 min={minDate}
                             />
-
                             <textarea className='input input-bordered p-3 h-[8rem]' placeholder='description...' />
                         </div>
                         <div className='grid grid-cols-5 gap-3'>

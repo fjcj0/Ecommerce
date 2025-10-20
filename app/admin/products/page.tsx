@@ -1,7 +1,9 @@
+"use client";
 import React from 'react';
 import { Trash, Edit } from 'lucide-react';
 import { products } from '@/data/data';
 import Image from 'next/image';
+import ModalEditProduct from '../components/ModalEditProduct';
 const page = () => {
     return (
         <div className='p-3 font-poppins h-full flex flex-col items-start justify-start gap-5'>
@@ -23,7 +25,12 @@ const page = () => {
                 </div>
                 <div className='flex items-center justify-center gap-3'>
                     <button type='button' className='btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300'><Trash size={23} /></button>
-                    <button type='button' className='btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300'><Edit size={23} /></button>
+                    <button type='button' className='btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300' onClick={() => {
+                        const dialog = document.getElementById('my_modal_3') as HTMLDialogElement;
+                        dialog?.showModal();
+                    }}
+                    ><Edit size={23} /></button>
+                    <ModalEditProduct />
                 </div>
             </div>
             <div className='w-full flex items-start justify-center'>

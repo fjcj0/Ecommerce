@@ -24,9 +24,10 @@ export async function GET() {
     m BOOLEAN DEFAULT FALSE,
     l BOOLEAN DEFAULT FALSE,
     xl BOOLEAN DEFAULT FALSE,
-    discount DECIMAL(5,2), -- allow NULL by removing DEFAULT 0.00
-    ends_in TIMESTAMP,     -- new column, can be NULL
+    discount DECIMAL(5,2),
+    ends_in TIMESTAMP,   
     quantity INTEGER DEFAULT 0,
+    is_visible BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW()
   );
