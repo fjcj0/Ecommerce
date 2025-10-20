@@ -54,3 +54,21 @@ export interface userProps {
     displayname: string;
     profilepicture: string;
 }
+export interface topTenProductProps {
+    shoe_id: number;
+    product_name: string;
+    image: string;
+    total_quantity_sold: number;
+    total_revenue: number;
+    increase?: number;
+    decrease?: number;
+}
+export interface adminDashboardInformationProps {
+    sumOfSales: number;
+    totalProducts: number;
+    totalUsers: number;
+    totalOrders: number;
+    totalOrdersDelivered: number;
+    percentAgeOfOrders: number;
+    topProducts: topTenProductProps[];
+}

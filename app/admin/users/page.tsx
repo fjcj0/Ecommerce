@@ -1,6 +1,7 @@
+"use client";
 import React from 'react';
 import { Trash } from 'lucide-react';
-import { reviews, users } from '@/data/data';
+import { users } from '@/data/data';
 import Image from 'next/image';
 const page = () => {
     return (
