@@ -100,11 +100,7 @@ const ModalEditProduct = ({ product }: { product: any }) => {
         );
     };
     if (!product) {
-        return (
-            <div className="flex items-center justify-center font-raleway text-primary px-3 py-2 bg-primary/20 rounded-3xl">
-                Click twice to at button edit to edit product
-            </div>
-        );
+        return null;
     }
     return (
         <dialog id="my_modal_3" className="modal">
