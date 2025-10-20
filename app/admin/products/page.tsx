@@ -8,6 +8,7 @@ const Page = () => {
     const { products, getProducts, isLoading } = useProductAdmin();
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [allSelected, setAllSelected] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<any | null>(null);
     useEffect(() => {
         getProducts();
     }, []);
@@ -27,7 +28,11 @@ const Page = () => {
         setSelectedRows(updatedRows);
         setAllSelected(updatedRows.every(Boolean));
     };
-
+    const handleEdit = (product: any) => {
+        setEditingProduct(product);
+        const dialog = document.getElementById('my_modal_3') as HTMLDialogElement;
+        dialog?.showModal();
+    };
     if (isLoading) {
         return (
             <div className="w-full h-[80%] flex items-center justify-center">
@@ -41,27 +46,14 @@ const Page = () => {
                 <div>
                     <label className="input input-bordered flex items-center gap-2">
                         <input type="text" className="grow" placeholder="Search" />
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 16 16"
-                            fill="currentColor"
-                            className="h-4 w-4 opacity-70">
-                            <path
-                                fillRule="evenodd"
-                                d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z"
-                                clipRule="evenodd" />
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" className="h-4 w-4 opacity-70">
+                            <path fillRule="evenodd" d="M9.965 11.026a5 5 0 1 1 1.06-1.06l2.755 2.754a.75.75 0 1 1-1.06 1.06l-2.755-2.754ZM10.5 7a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Z" clipRule="evenodd" />
                         </svg>
                     </label>
                 </div>
                 <div className='flex items-center justify-center gap-3'>
                     <button type='button' className='btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300'><Trash size={23} /></button>
-                    <button type='button' className='btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300' onClick={() => {
-                        const dialog = document.getElementById('my_modal_3') as HTMLDialogElement;
-                        dialog?.showModal();
-                    }}
-                    ><Edit size={23} /></button>
-
-                    <ModalEditProduct />
+                    <ModalEditProduct product={editingProduct} />
                 </div>
             </div>
             <div className='w-full flex items-start justify-center'>
@@ -71,12 +63,7 @@ const Page = () => {
                             <tr>
                                 <th>
                                     <label>
-                                        <input
-                                            type="checkbox"
-                                            className="checkbox"
-                                            checked={allSelected}
-                                            onChange={handleSelectAll}
-                                        />
+                                        <input type="checkbox" className="checkbox" checked={allSelected} onChange={handleSelectAll} />
                                     </label>
                                 </th>
                                 <th>Product</th>
@@ -85,52 +72,47 @@ const Page = () => {
                                 <th>Quantity</th>
                                 <th>Sizes</th>
                                 <th>Visible</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {
-                                !products || products.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={7} className="text-center">No products!!</td>
-                                    </tr>
-                                ) : (
-                                    products.map((product: any, index: number) => (
-                                        <tr key={index}>
-                                            <th>
-                                                <label>
-                                                    <input
-                                                        type="checkbox"
-                                                        className="checkbox"
-                                                        checked={selectedRows[index] || false}
-                                                        onChange={() => handleRowSelect(index)}
-                                                    />
-                                                </label>
-                                            </th>
-                                            <td>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="avatar sm:block hidden">
-                                                        <Image src={product.images[0]} alt={product.title} width={50} height={50} />
-                                                    </div>
-                                                    <div>
-                                                        <div className="font-bold">{product.title}</div>
-                                                    </div>
+                            {!products || products.length === 0 ? (
+                                <tr>
+                                    <td colSpan={8} className="text-center">No products!!</td>
+                                </tr>
+                            ) : (
+                                products.map((product: any, index: number) => (
+                                    <tr key={index}>
+                                        <th>
+                                            <label>
+                                                <input type="checkbox" className="checkbox" checked={selectedRows[index] || false} onChange={() => handleRowSelect(index)} />
+                                            </label>
+                                        </th>
+                                        <td>
+                                            <div className="flex items-center gap-3">
+                                                <div className="avatar sm:block hidden">
+                                                    <Image src={product.images[0]} alt={product.title} width={50} height={50} />
                                                 </div>
-                                            </td>
-                                            <td>{product.price}</td>
-                                            <td>{product.available}</td>
-                                            <td>{product.quantity}</td>
-                                            <td>
-                                                {['XS', 'S', 'M', 'L', 'XL']
-                                                    .filter(size => product[size.toLowerCase()])
-                                                    .join(', ')}
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" className="toggle" defaultChecked={product.is_visible} />
-                                            </td>
-                                        </tr>
-                                    ))
-                                )
-                            }
+                                                <div>
+                                                    <div className="font-bold">{product.title}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>{product.price}</td>
+                                        <td>{product.available}</td>
+                                        <td>{product.quantity}</td>
+                                        <td>{['XS', 'S', 'M', 'L', 'XL'].filter(size => product[size.toLowerCase()]).join(', ')}</td>
+                                        <td>
+                                            <input type="checkbox" className="toggle" defaultChecked={product.is_visible} />
+                                        </td>
+                                        <td>
+                                            <button type='button' className='btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300' onClick={() => handleEdit(product)}>
+                                                <Edit size={23} />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>
@@ -143,5 +125,5 @@ const Page = () => {
             </div>
         </div>
     );
-}
+};
 export default Page;
