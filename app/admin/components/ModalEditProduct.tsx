@@ -4,8 +4,10 @@ import { Image, X } from "lucide-react";
 import { baseUrl, imagesStateProps } from "@/global.t";
 import axios from "axios";
 import toast from "react-hot-toast";
+import useProductAdmin from "@/store/productStore";
 const ModalEditProduct = ({ product }: { product: any }) => {
-    const sizes = ["XS", "SM", "M", "L", "XL"];
+    const { updateProduct, isLoadingModal, getProducts } = useProductAdmin();
+    const sizes = ["XS", "S", "M", "L", "XL"];
     const today = new Date();
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
@@ -98,6 +100,30 @@ const ModalEditProduct = ({ product }: { product: any }) => {
         setSelectedSizes((prev) =>
             prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size]
         );
+    };
+    const onSubmit = async () => {
+        if (!product?.id) return;
+        try {
+            const sizesChosen = [
+                selectedSizes.includes("XS"),
+                selectedSizes.includes("S"),
+                selectedSizes.includes("M"),
+                selectedSizes.includes("L"),
+                selectedSizes.includes("XL"),
+            ];
+            await updateProduct(product.id, {
+                sizesChosen,
+                quantity: Number(quantity),
+                discount: Number(discount),
+                title,
+                price: Number(price),
+                endsIn,
+                description,
+            });
+            await getProducts();
+        } catch (error) {
+            console.log(error instanceof Error ? error.message : error);
+        }
     };
     if (!product) {
         return null;
@@ -231,10 +257,14 @@ const ModalEditProduct = ({ product }: { product: any }) => {
                                     ))}
                                 </div>
                                 <button
+                                    disabled={isLoadingModal}
+                                    onClick={onSubmit}
                                     type="button"
-                                    className="font-bold px-4 py-2 text-primary border border-primary/50 rounded-lg hover:bg-primary/50"
+                                    className={`font-bold px-4 py-2 text-primary border border-primary/50 rounded-lg hover:bg-primary/50 ${isLoadingModal ? 'opacity-50' : ''}`}
                                 >
-                                    Edit
+                                    {
+                                        isLoadingModal ? <span className="loading loading-infinity loading-md"></span> : 'Edit'
+                                    }
                                 </button>
                             </div>
                         </div>

@@ -5,6 +5,7 @@ import { baseUrl, createProductProps, updateProductsProps } from "@/global.t";
 type ProductStoreProps = {
     error: null | string | unknown;
     isLoading: boolean;
+    isLoadingModal: boolean;
     products: any;
     product: any;
     isLoadingVisible: boolean,
@@ -38,6 +39,7 @@ type ProductStoreProps = {
 const useProductAdmin = create<ProductStoreProps>((set, get) => ({
     error: null,
     isLoading: false,
+    isLoadingModal: false,
     products: [],
     product: null,
     isLoadingVisible: false,
@@ -110,14 +112,23 @@ const useProductAdmin = create<ProductStoreProps>((set, get) => ({
         productId: number,
         { sizesChosen, quantity, discount, title, price, endsIn, description }: updateProductsProps
     ) => {
-        set({ isLoading: true, error: null });
+        set({ isLoadingModal: true, error: null });
         try {
-
+            await axios.put(`${baseUrl}/api/product/${productId}`, {
+                sizesChosen,
+                quantity,
+                discount,
+                title,
+                price,
+                endsIn,
+                description,
+            });
+            toast.success(`Product information updated successfully!!`);
         } catch (error: unknown) {
             if (error instanceof Error) set({ error: error.message });
             else set({ error: error });
         } finally {
-            set({ isLoading: false });
+            set({ isLoadingModal: false });
         }
     },
     updateVisible: async (productId: number, value: boolean) => {
