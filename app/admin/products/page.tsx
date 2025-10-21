@@ -57,9 +57,10 @@ const Page = () => {
     const onChangeVisible = async (productId: number, value: boolean) => {
         await updateVisible(productId, value);
     };
+    const isAnyRowSelected = selectedRows.some(Boolean);
     if (isLoading) {
         return (
-            <div className="w-full h-[80%] flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center">
                 <span className="loading loading-infinity loading-lg"></span>
             </div>
         );
@@ -95,6 +96,7 @@ const Page = () => {
                 </div>
                 <div className="flex items-center justify-center gap-3">
                     <button
+                        disabled={!isAnyRowSelected}
                         type="button"
                         className="btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300"
                     >
@@ -177,7 +179,6 @@ const Page = () => {
                                         <td>
                                             {
                                                 !isLoadingVisible ?
-
                                                     <input
                                                         type="checkbox"
                                                         onChange={(e) => onChangeVisible(product.id, e.target.checked)}
