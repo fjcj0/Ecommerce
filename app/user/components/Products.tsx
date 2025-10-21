@@ -62,12 +62,13 @@ const Products = () => {
                                 image={product.images?.[0]}
                                 available={product.available}
                                 quantity={product.quantity}
+                                is_visible={product.is_visible}
                             />
                         );
                     })
                 ) : (
-                    <div className="col-span-full text-center text-gray-500">
-                        No products match your filters.
+                    <div className="col-span-full md:h-[50vh] flex items-center justify-center text-center font-raleway text-primary">
+                        No products match your filters
                     </div>
                 )}
             </div>

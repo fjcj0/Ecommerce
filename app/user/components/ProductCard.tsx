@@ -3,7 +3,8 @@ import Image from 'next/image';
 import React from 'react';
 import { CheckCircle, XIcon } from 'lucide-react';
 import Link from 'next/link';
-const ProductCard = ({ id, title, price, sizes, image, available, quantity }: productsProps & { id: number }) => {
+const ProductCard = ({ id, title, price, sizes, image, available, quantity, is_visible }: productsProps & { id: number, is_visible: boolean }) => {
+    if (!is_visible) return null;
     return (
         <div className="card w-full shadow-sm">
             <div className="relative w-full h-[15rem] rounded-t-xl bg-primary/30 overflow-hidden">

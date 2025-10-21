@@ -28,6 +28,13 @@ const Page = () => {
             </div>
         );
     }
+    if (!isLoading && product && !product.is_visible) {
+        return (
+            <div className='w-full flex items-center justify-center h-[80%]'>
+                <h1 className='font-raleway font-bold lg:text-8xl md:text-6xl text-3xl text-center text-red-500'>Error 404 Page Not Found</h1>
+            </div>
+        );
+    }
     return (
         <div className="p-3 flex flex-col gap-14">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 bg-base-300 p-5 rounded-3xl">
