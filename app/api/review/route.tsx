@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
                  LIMIT 1) AS image_url
             FROM reviews
             INNER JOIN users ON reviews.user_id = users.id
-            INNER JOIN shoes ON reviews.shoe_id = shoes.id;
+            INNER JOIN shoes ON reviews.shoe_id = shoes.id
         `;
         return NextResponse.json(
             { reviews },
