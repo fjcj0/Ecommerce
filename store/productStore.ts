@@ -7,6 +7,7 @@ type ProductStoreProps = {
     isLoading: boolean;
     products: any;
     product: any;
+    isLoadingVisible: boolean,
     createProduct: ({
         imagesAddedBase64,
         sizesChosen,
@@ -32,12 +33,14 @@ type ProductStoreProps = {
             description,
         }: updateProductsProps
     ) => Promise<void>;
+    updateVisible: (productId: number, value: boolean) => Promise<void>;
 };
 const useProductAdmin = create<ProductStoreProps>((set, get) => ({
     error: null,
     isLoading: false,
     products: [],
     product: null,
+    isLoadingVisible: false,
     createProduct: async ({ imagesAddedBase64,
         sizesChosen,
         quantity,
@@ -117,5 +120,24 @@ const useProductAdmin = create<ProductStoreProps>((set, get) => ({
             set({ isLoading: false });
         }
     },
+    updateVisible: async (productId: number, value: boolean) => {
+        set({ isLoadingVisible: true });
+        try {
+            await axios.put(`${baseUrl}/api/change-visible`, { productId, value });
+            set((state) => ({
+                products: state.products.map((p: any) =>
+                    p.id === productId ? { ...p, is_visible: value } : p
+                ),
+            }));
+            toast.success('Product visibility updated!');
+        } catch (error: unknown) {
+            if (error instanceof Error) set({ error: error.message });
+            else set({ error });
+            toast.error('Failed to update visibility!!');
+        } finally {
+            set({ isLoadingVisible: false });
+        }
+    },
+
 }));
 export default useProductAdmin;

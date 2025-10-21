@@ -4,9 +4,10 @@ import { Trash, Edit } from "lucide-react";
 import Image from "next/image";
 import ModalEditProduct from "../components/ModalEditProduct";
 import useProductAdmin from "@/store/productStore";
+import { Span } from "next/dist/trace";
 const ITEMS_PER_PAGE = 5;
 const Page = () => {
-    const { products, getProducts, isLoading } = useProductAdmin();
+    const { products, getProducts, isLoading, updateVisible, isLoadingVisible } = useProductAdmin();
     const [selectedRows, setSelectedRows] = useState<boolean[]>([]);
     const [allSelected, setAllSelected] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any | null>(null);
@@ -52,6 +53,9 @@ const Page = () => {
     };
     const handlePrevPage = () => {
         if (currentPage > 1) setCurrentPage((p) => p - 1);
+    };
+    const onChangeVisible = async (productId: number, value: boolean) => {
+        await updateVisible(productId, value);
     };
     if (isLoading) {
         return (
@@ -171,11 +175,18 @@ const Page = () => {
                                                 .join(", ")}
                                         </td>
                                         <td>
-                                            <input
-                                                type="checkbox"
-                                                className="toggle"
-                                                defaultChecked={product.is_visible}
-                                            />
+                                            {
+                                                !isLoadingVisible ?
+
+                                                    <input
+                                                        type="checkbox"
+                                                        onChange={(e) => onChangeVisible(product.id, e.target.checked)}
+                                                        className="toggle"
+                                                        checked={product.is_visible}
+                                                    />
+                                                    :
+                                                    <span className="loading loading-infinity loading-md"></span>
+                                            }
                                         </td>
                                         <td>
                                             <button
