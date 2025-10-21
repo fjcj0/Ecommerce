@@ -89,7 +89,8 @@ const useProductAdmin = create<ProductStoreProps>((set, get) => ({
     getProduct: async (productId: number) => {
         set({ isLoading: true, error: null });
         try {
-
+            const response = await axios.get(`${baseUrl}/api/get-product/${productId}`);
+            set({ product: response.data.shoe });
         } catch (error: unknown) {
             if (error instanceof Error) set({ error: error.message });
             else set({ error: error });

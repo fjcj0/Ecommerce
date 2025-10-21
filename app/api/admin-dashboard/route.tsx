@@ -34,41 +34,47 @@ export async function GET() {
         : 0;
     const salesPerMonthRaw = await sql`
       SELECT 
-        TO_CHAR(created_at, 'Mon') AS month,
-        EXTRACT(YEAR FROM created_at) AS year,
-        SUM(price) AS total_sales
+        TO_CHAR(created_at, 'YYYY-Mon') AS month,
+        SUM(price) AS total_sales,
+        MIN(created_at) AS first_date
       FROM sales
       WHERE created_at >= CURRENT_DATE - INTERVAL '9 months'
-      GROUP BY year, month, EXTRACT(MONTH FROM created_at)
-      ORDER BY year, EXTRACT(MONTH FROM created_at);
+      GROUP BY TO_CHAR(created_at, 'YYYY-Mon')
+      ORDER BY first_date;
     `;
     adminDashboardInformation.salesPerMonth = salesPerMonthRaw.map(row => ({
       month: String(row.month),
       total: Number(row.total_sales),
     }));
-    const topProductsRaw = await sql`
-      SELECT 
-        s.shoe_id,
-        sh.title AS product_name,
-        MIN(img.url) AS image_url,    
-        SUM(s.quantity) AS total_quantity_sold,
-        SUM(s.price) AS total_revenue
-      FROM sales s
-      JOIN shoes sh ON sh.id = s.shoe_id
-      LEFT JOIN images img ON img.shoe_id = sh.id
-      WHERE s.created_at >= CURRENT_DATE - INTERVAL '9 months'
-      GROUP BY s.shoe_id, sh.title
-      ORDER BY total_quantity_sold DESC
-      LIMIT 10;
-    `;
-    const topProducts: topTenProductProps[] = topProductsRaw.map(row => ({
+    const lastProductsRaw = await sql`
+  SELECT 
+    sh.id AS shoe_id,
+    sh.title AS product_name,
+    (SELECT url FROM images img WHERE img.shoe_id = sh.id ORDER BY img.id ASC LIMIT 1) AS image_url,
+    sh.created_at
+  FROM shoes sh
+  ORDER BY sh.created_at DESC
+  LIMIT 10;
+`;
+    const topProducts: topTenProductProps[] = lastProductsRaw.map(row => ({
       shoe_id: Number(row.shoe_id),
       product_name: String(row.product_name),
       image: row.image_url ? String(row.image_url) : "",
-      total_quantity_sold: Number(row.total_quantity_sold),
-      total_revenue: Number(row.total_revenue),
+      total_quantity_sold: 0,
+      total_revenue: 0,
     }));
     adminDashboardInformation.topProducts = topProducts;
+    const recentProductsRaw = await sql`
+      SELECT *
+      FROM shoes
+      WHERE created_at >= CURRENT_DATE - INTERVAL '9 months'
+      ORDER BY created_at DESC;
+    `;
+    adminDashboardInformation.productsPerMonth = recentProductsRaw.map(row => ({
+      id: Number(row.id),
+      title: String(row.title),
+      created_at: row.created_at,
+    }));
     return NextResponse.json(adminDashboardInformation, { status: 200 });
   } catch (error: unknown) {
     console.log(error instanceof Error ? error.message : String(error));

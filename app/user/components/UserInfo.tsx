@@ -10,16 +10,13 @@ const UserInfo = () => {
                     </div>
                     <div className="stat-title">Total Orders</div>
                     <div className="stat-value text-primary">25.6K</div>
-                    <div className="stat-desc">21% more than last month</div>
                 </div>
-
                 <div className="stat">
                     <div className="stat-figure text-secondary">
                         <Store className="h-8 w-8" />
                     </div>
-                    <div className="stat-title">Total Sales</div>
+                    <div className="stat-title">Total Purchases</div>
                     <div className="stat-value text-secondary">2.6M</div>
-                    <div className="stat-desc">21% more than last month</div>
                 </div>
             </div>
         </div>

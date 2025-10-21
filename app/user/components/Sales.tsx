@@ -6,7 +6,8 @@ const Sales = () => {
     return (
         <div className='flex flex-col p-3 w-full bg-base-300 rounded-lg gap-4'>
             <div className='w-full flex justify-between items-center font-raleway'>
-                <h1 className='font-bold text-lg'>Sales</h1>
+                <h1 className='font-bold text-lg'>Last Purchases
+                </h1>
                 <div className='p-3 bg-primary/30 rounded-full'>
                     <DollarSign size={30} />
                 </div>
