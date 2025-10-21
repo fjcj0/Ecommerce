@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import Helpers from '../components/Helpers';
 import Products from '../components/Products';
@@ -11,7 +12,6 @@ const page = () => {
                             <Helpers />
                         </div>
                     </div>
-
                     <div className='md:col-span-4'>
                         <div className='w-full flex flex-col'>
                             <Products />

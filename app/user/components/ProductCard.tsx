@@ -2,7 +2,8 @@ import { productsProps } from '@/global.t';
 import Image from 'next/image';
 import React from 'react';
 import { CheckCircle, XIcon } from 'lucide-react';
-const ProductCard = ({ title, price, sizes, image, available, quantity }: productsProps) => {
+import Link from 'next/link';
+const ProductCard = ({ id, title, price, sizes, image, available, quantity }: productsProps & { id: number }) => {
     return (
         <div className="card w-full shadow-sm">
             <div className="relative w-full h-[15rem] rounded-t-xl bg-primary/30 overflow-hidden">
@@ -41,7 +42,7 @@ const ProductCard = ({ title, price, sizes, image, available, quantity }: produc
                     ))}
                 </div>
                 <div className="w-full flex justify-start items-end mt-3 h-full">
-                    <button className="btn btn-outline px-5 text-sm font-raleway">View</button>
+                    <Link href={`/user/product/${id}`} className="btn btn-outline px-5 text-sm font-raleway">View</Link>
                 </div>
             </div>
         </div>
