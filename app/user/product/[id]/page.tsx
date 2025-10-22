@@ -1,19 +1,28 @@
 "use client";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { userReviews } from '@/data/data';
 import Reviews from '../../components/Reviews';
 import Comment from '../../components/Comment';
 import useProductAdmin from '@/store/productStore';
 import { useParams } from 'next/navigation';
+
 const Page = () => {
     const params = useParams();
     const { id }: any = params;
     const isAuthCommented: boolean = true;
     const { product, getProduct, isLoading } = useProductAdmin();
+    const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
     useEffect(() => {
         if (id) getProduct(Number(id));
     }, [id]);
+
+    // Reset selected image when product changes
+    useEffect(() => {
+        setSelectedImageIndex(0);
+    }, [product]);
+
     if (isLoading) {
         return (
             <div className='w-full flex items-center justify-center h-[80%]'>
@@ -21,6 +30,7 @@ const Page = () => {
             </div>
         );
     }
+
     if (!isLoading && !product) {
         return (
             <div className='w-full flex items-center justify-center h-[80%]'>
@@ -28,6 +38,7 @@ const Page = () => {
             </div>
         );
     }
+
     if (!isLoading && product && !product.is_visible) {
         return (
             <div className='w-full flex items-center justify-center h-[80%]'>
@@ -35,34 +46,62 @@ const Page = () => {
             </div>
         );
     }
+
+    const handleImageClick = (index: number) => {
+        setSelectedImageIndex(index);
+    };
+
     return (
         <div className="p-3 flex flex-col gap-14">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 bg-base-300 p-5 rounded-3xl">
-                <div className="flex justify-center items-center relative">
+                <div className="flex flex-col justify-center items-center relative gap-5">
                     {product.discount && (
-                        <div className="absolute top-0 left-3">
+                        <div className="absolute top-0 left-3 z-10">
                             <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm font-raleway shadow-md">
                                 Discount: {product.discount}%
                             </p>
                         </div>
                     )}
                     {product.ends_in && (
-                        <div className="absolute top-0 right-3">
+                        <div className="absolute top-0 right-3 z-10">
                             <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm font-raleway shadow-md">
                                 Ends In: {new Date(product.ends_in).toLocaleDateString()}
                             </p>
                         </div>
                     )}
-                    {product.images?.[0] && (
+                    {product.images?.[selectedImageIndex] && (
                         <Image
-                            src={product.images[0]}
+                            src={product.images[selectedImageIndex]}
                             alt={product.title}
                             width={650}
                             height={650}
-                            className="rounded-3xl object-contain"
+                            className="rounded-3xl object-contain transition-opacity duration-300"
+                            priority
                         />
                     )}
+                    <div className="grid grid-cols-5 gap-3 self-start">
+                        {product.images.map((image: string, index: number) => (
+                            <button
+                                type='button'
+                                key={index}
+                                onClick={() => handleImageClick(index)}
+                                className={`relative transition-all duration-200 rounded-xl border-2 ${index === selectedImageIndex
+                                    ? 'transform scale-105 border-primary'
+                                    : 'opacity-80 hover:opacity-100 hover:scale-105'
+                                    }`}
+                            >
+                                <Image
+                                    src={image}
+                                    width={70}
+                                    height={70}
+                                    alt={`Thumbnail ${index + 1}`}
+                                    className='rounded-xl object-contain'
+                                />
+                            </button>
+                        ))}
+                    </div>
                 </div>
+
                 <div className="flex flex-col items-start justify-center gap-5">
                     <div className="flex items-start justify-start gap-3 font-raleway font-medium">
                         <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm">
@@ -78,7 +117,7 @@ const Page = () => {
                     </p>
                     <div className="flex items-center justify-start gap-3">
                         <button type="button" className="btn btn-circle">-</button>
-                        <p className="text-primary font-bold bg-primary/30 px-2 py-2 w-[3rem] h-[3rem] flex items-center justify-center  rounded-full">1</p>
+                        <p className="text-primary font-bold bg-primary/30 px-2 py-2 w-[3rem] h-[3rem] flex items-center justify-center rounded-full">1</p>
                         <button type="button" className="btn btn-circle">+</button>
                     </div>
                     <div className="grid grid-cols-3 gap-3">
@@ -99,6 +138,7 @@ const Page = () => {
                     </button>
                 </div>
             </div>
+
             <div className="flex flex-col gap-5">
                 <h1 className="text-5xl font-light font-raleway text-primary text-center">
                     User <span className="font-bold">Reviews</span>
@@ -120,4 +160,5 @@ const Page = () => {
         </div>
     );
 };
+
 export default Page;

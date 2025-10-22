@@ -62,20 +62,20 @@ export async function POST(request: NextRequest) {
 }
 export async function DELETE(request: NextRequest) {
     try {
-        const { data } = await request.json();
-        const { ids } = data;
-        if (!ids)
+        const { ids } = await request.json();
+        if (!ids || !Array.isArray(ids) || ids.length === 0) {
             return NextResponse.json(
                 {
                     error: "Need at least one id to delete review!!",
                 },
                 { status: 400 }
             );
-        for (const id of ids) {
-            sql`
-            DELETE FROM reviews WHERE id = ${id};
-            `;
         }
+        await Promise.all(
+            ids.map(id =>
+                sql`DELETE FROM reviews WHERE id = ${id};`
+            )
+        );
         return NextResponse.json(
             {
                 message: "All reviews deleted successfully!!",
@@ -85,8 +85,8 @@ export async function DELETE(request: NextRequest) {
     } catch (error: unknown) {
         console.log(error instanceof Error ? error.message : error);
         return NextResponse.json(
-            { error: error instanceof Error ? error.message : error },
-            { status: 400 }
+            { error: error instanceof Error ? error.message : "Internal server error" },
+            { status: 500 }
         );
     }
 }

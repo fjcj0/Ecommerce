@@ -35,11 +35,9 @@ const useReviews = create<ReviewState>((set, get) => ({
     deleteReviews: async (ids: number[]) => {
         set({ isLoadingReviews: true, error: null });
         try {
-            await axios.delete(`${baseUrl}/api/review`,
-                {
-
-                }
-            );
+            await axios.delete(`${baseUrl}/api/review`, {
+                data: { ids }
+            });
             toast.success(`Review deleted successfully!!`)
         } catch (error: unknown) {
             if (error instanceof Error) toast.error(error.message);
