@@ -54,23 +54,30 @@ export async function GET() {
       );
     `;
     await sql`
-      CREATE TABLE IF NOT EXISTS checkouts (
-        id SERIAL PRIMARY KEY,
-        user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-        shoe_id INTEGER REFERENCES shoes(id) ON DELETE CASCADE,
-        size TEXT CHECK (size IN ('XS','S','M','L','XL')),
-        quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
-        created_at TIMESTAMP DEFAULT NOW(),
-        updated_at TIMESTAMP DEFAULT NOW(),
-        UNIQUE (user_id, shoe_id, size)
-      );
-    `;
+  CREATE TABLE IF NOT EXISTS checkouts (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    shoe_id INTEGER REFERENCES shoes(id) ON DELETE CASCADE,
+    xs BOOLEAN NULL,
+    s BOOLEAN NULL,
+    m BOOLEAN NULL,
+    l BOOLEAN NULL,
+    xl BOOLEAN NULL,
+    quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+  );
+`;
     await sql`
       CREATE TABLE IF NOT EXISTS orders (
         id SERIAL PRIMARY KEY,
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         shoe_id INTEGER REFERENCES shoes(id) ON DELETE SET NULL,
-        size TEXT CHECK (size IN ('XS','S','M','L','XL')) NOT NULL,
+        xs BOOLEAN NULL,
+        s BOOLEAN NULL,
+        m BOOLEAN NULL,
+        l BOOLEAN NULL,
+        xl BOOLEAN NULL,
         quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
         total_amount DECIMAL(10,2),
         price DECIMAL(10,2),

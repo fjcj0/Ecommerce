@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 const Home = () => {
     return (
@@ -23,12 +24,11 @@ const Home = () => {
                     of options to suit every occasion and personality. Our user-friendly platform makes shopping effortless.
                 </p>
 
-                <button
-                    type="button"
+                <Link href={'/user'}
                     className="btn btn-primary font-raleway text-primary-300 mt-3 rounded-lg"
                 >
                     Get Started
-                </button>
+                </Link>
             </div>
             <div className="relative hidden lg:flex items-center justify-center">
                 <Image

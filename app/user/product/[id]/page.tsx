@@ -6,23 +6,40 @@ import Reviews from '../../components/Reviews';
 import Comment from '../../components/Comment';
 import useProductAdmin from '@/store/productStore';
 import { useParams } from 'next/navigation';
-
 const Page = () => {
     const params = useParams();
     const { id }: any = params;
     const isAuthCommented: boolean = true;
     const { product, getProduct, isLoading } = useProductAdmin();
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-
+    const [sizesChosen, setSizesChosen] = useState({
+        'xs': false,
+        's': false,
+        'm': false,
+        'l': false,
+        'xl': false
+    });
+    const handleOnSelectSize = (size: string) => {
+        setSizesChosen(prevState => ({
+            ...prevState,
+            [size.toLowerCase()]: !prevState[size.toLowerCase() as keyof typeof prevState]
+        }));
+    };
+    const selectedSizesCount = Object.values(sizesChosen).filter(Boolean).length;
     useEffect(() => {
         if (id) getProduct(Number(id));
     }, [id]);
-
-    // Reset selected image when product changes
     useEffect(() => {
         setSelectedImageIndex(0);
+        setSizesChosen({
+            'xs': false,
+            's': false,
+            'm': false,
+            'l': false,
+            'xl': false
+        });
     }, [product]);
-
+    const [quantity, setQuantity] = useState<number>(1);
     if (isLoading) {
         return (
             <div className='w-full flex items-center justify-center h-[80%]'>
@@ -30,7 +47,6 @@ const Page = () => {
             </div>
         );
     }
-
     if (!isLoading && !product) {
         return (
             <div className='w-full flex items-center justify-center h-[80%]'>
@@ -38,7 +54,6 @@ const Page = () => {
             </div>
         );
     }
-
     if (!isLoading && product && !product.is_visible) {
         return (
             <div className='w-full flex items-center justify-center h-[80%]'>
@@ -46,24 +61,22 @@ const Page = () => {
             </div>
         );
     }
-
     const handleImageClick = (index: number) => {
         setSelectedImageIndex(index);
     };
-
     return (
         <div className="p-3 flex flex-col gap-14">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 bg-base-300 p-5 rounded-3xl">
                 <div className="flex flex-col justify-center items-center relative gap-5">
                     {product.discount && (
-                        <div className="absolute top-0 left-3 z-10">
+                        <div className="absolute top-0 left-3">
                             <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm font-raleway shadow-md">
                                 Discount: {product.discount}%
                             </p>
                         </div>
                     )}
                     {product.ends_in && (
-                        <div className="absolute top-0 right-3 z-10">
+                        <div className="absolute top-0 right-3">
                             <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm font-raleway shadow-md">
                                 Ends In: {new Date(product.ends_in).toLocaleDateString()}
                             </p>
@@ -101,7 +114,6 @@ const Page = () => {
                         ))}
                     </div>
                 </div>
-
                 <div className="flex flex-col items-start justify-center gap-5">
                     <div className="flex items-start justify-start gap-3 font-raleway font-medium">
                         <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm">
@@ -115,15 +127,76 @@ const Page = () => {
                     <p className="text-primary font-raleway text-md font-medium max-w-lg lg:max-w-3xl">
                         {product.description}
                     </p>
+                    <p className='px-4 py-2 bg-primary/30 text-primary font-poppins rounded-3xl'>Price: ${product.price}</p>
+
                     <div className="flex items-center justify-start gap-3">
-                        <button type="button" className="btn btn-circle">-</button>
-                        <p className="text-primary font-bold bg-primary/30 px-2 py-2 w-[3rem] h-[3rem] flex items-center justify-center rounded-full">1</p>
-                        <button type="button" className="btn btn-circle">+</button>
+                        <button
+                            type="button"
+                            className="btn btn-circle"
+                            onClick={() => {
+                                if (quantity > 1) {
+                                    setQuantity(quantity - 1);
+                                }
+                            }}
+                        >-</button>
+                        <p className="text-primary font-bold bg-primary/30 px-2 py-2 w-[3rem] h-[3rem] flex items-center justify-center rounded-full">{quantity}</p>
+                        <button
+                            type="button"
+                            className="btn btn-circle"
+                            onClick={() => setQuantity(quantity + 1)}
+                        >+</button>
                     </div>
-                    <div className="grid grid-cols-3 gap-3">
-                        {['xs', 's', 'm', 'l', 'xl'].filter(size => product[size]).map((size, idx) => (
-                            <button type="button" className="btn btn-circle" key={idx}>{size.toUpperCase()}</button>
-                        ))}
+                    <div className="flex flex-col gap-3">
+                        <div className="grid grid-cols-3 gap-3">
+                            {product.xs !== false && (
+                                <button
+                                    type="button"
+                                    className={`btn btn-circle ${sizesChosen.xs ? 'btn-primary' : 'btn-outline'}`}
+                                    onClick={() => handleOnSelectSize('xs')}
+                                >
+                                    XS
+                                </button>
+                            )}
+                            {product.s !== false && (
+                                <button
+                                    type="button"
+                                    className={`btn btn-circle ${sizesChosen.s ? 'btn-primary' : 'btn-outline'}`}
+                                    onClick={() => handleOnSelectSize('s')}
+                                >
+                                    S
+                                </button>
+                            )}
+                            {product.m !== false && (
+                                <button
+                                    type="button"
+                                    className={`btn btn-circle ${sizesChosen.m ? 'btn-primary' : 'btn-outline'}`}
+                                    onClick={() => handleOnSelectSize('m')}
+                                >
+                                    M
+                                </button>
+                            )}
+                            {product.l !== false && (
+                                <button
+                                    type="button"
+                                    className={`btn btn-circle ${sizesChosen.l ? 'btn-primary' : 'btn-outline'}`}
+                                    onClick={() => handleOnSelectSize('l')}
+                                >
+                                    L
+                                </button>
+                            )}
+                            {product.xl !== false && (
+                                <button
+                                    type="button"
+                                    className={`btn btn-circle ${sizesChosen.xl ? 'btn-primary' : 'btn-outline'}`}
+                                    onClick={() => handleOnSelectSize('xl')}
+                                >
+                                    XL
+                                </button>
+                            )}
+                        </div>
+                        {!product.xs && !product.s && !product.m && !product.l && !product.xl && (
+                            <p className="text-warning">No sizes available for this product</p>
+                        )}
                     </div>
                     <div className="flex items-center justify-center gap-3">
                         <p className="text-primary bg-primary/30 px-5 py-1 rounded-3xl text-sm">3.5</p>
@@ -133,12 +206,15 @@ const Page = () => {
                             ))}
                         </div>
                     </div>
-                    <button type="button" className="btn btn-primary">
-                        CheckOut
+                    <button
+                        type="button"
+                        className="btn btn-primary"
+                        disabled={selectedSizesCount === 0 || product.available === 0}
+                    >
+                        {selectedSizesCount === 0 ? 'Select Sizes' : product.available === 0 ? 'Out of Stock' : `CheckOut`}
                     </button>
                 </div>
             </div>
-
             <div className="flex flex-col gap-5">
                 <h1 className="text-5xl font-light font-raleway text-primary text-center">
                     User <span className="font-bold">Reviews</span>
@@ -160,5 +236,4 @@ const Page = () => {
         </div>
     );
 };
-
 export default Page;

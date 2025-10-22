@@ -1,4 +1,5 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 const OurWork = () => {
     return (
@@ -17,9 +18,9 @@ const OurWork = () => {
                             ensuring quality, innovation, and satisfaction in every project we undertake.
                             Our goal is to create meaningful experiences and long-lasting relationships with everyone we work with.
                         </p>
-                        <button type="button" className="btn btn-outline">
+                        <Link href={'/user'} className="btn btn-outline">
                             Let's Go
-                        </button>
+                        </Link>
 
                     </div>
                 </div>
