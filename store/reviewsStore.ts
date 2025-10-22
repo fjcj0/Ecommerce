@@ -5,16 +5,18 @@ import axios from 'axios';
 type ReviewState = {
     isLoadingReviews: boolean;
     error: string | null;
+    isUserReviewLoading: boolean;
     userReview: any;
     reviews: any;
     userReviews: any;
     getReviews: () => Promise<void>;
     deleteReviews: (ids: number[]) => Promise<void>;
-    getUsersReviews: (id: number) => Promise<void>;
+    getUsersReviews: (id: number, userId?: number | null) => Promise<void>;
     getUserReview: (productId: number, userId: number) => Promise<void>;
     deleteUserReview: (productId: number, userId: number) => Promise<void>;
 };
 const useReviews = create<ReviewState>((set, get) => ({
+    isUserReviewLoading: false,
     isLoadingReviews: false,
     error: null,
     userReview: null,
@@ -46,26 +48,41 @@ const useReviews = create<ReviewState>((set, get) => ({
             set({ isLoadingReviews: false });
         }
     },
-    getUsersReviews: async (id: number) => {
+    getUsersReviews: async (id: number, userId?: number | null) => {
+        console.log(userId);
         set({ isLoadingReviews: true, error: null });
         try {
-
+            const headers: any = {};
+            if (userId) {
+                headers['x-user-id'] = userId;
+            }
+            const response = await axios.get(`${baseUrl}/api/review/${id}`, {
+                headers
+            });
+            set({ userReviews: response.data.reviews });
         } catch (error: unknown) {
             if (error instanceof Error) toast.error(error.message);
             else toast.error(String(error));
+            set({ error: error instanceof Error ? error.message : String(error) });
         } finally {
             set({ isLoadingReviews: false });
         }
     },
     getUserReview: async (productId: number, userId: number) => {
-        set({ isLoadingReviews: true, error: null });
+        set({ isUserReviewLoading: true, error: null });
         try {
-
+            const response = await axios.get(`${baseUrl}/api/review/user/${userId}/${productId}`);
+            set({ userReview: response.data.userReview || null });
         } catch (error: unknown) {
-            if (error instanceof Error) toast.error(error.message);
-            else toast.error(String(error));
+            if (axios.isAxiosError(error) && error.response?.status === 404) {
+                set({ userReview: null });
+            } else if (error instanceof Error) {
+                toast.error(error.message);
+            } else {
+                toast.error(String(error));
+            }
         } finally {
-            set({ isLoadingReviews: false });
+            set({ isUserReviewLoading: false });
         }
     },
     deleteUserReview: async (productId: number, userId: number) => {
@@ -80,4 +97,5 @@ const useReviews = create<ReviewState>((set, get) => ({
         }
     },
 }));
+
 export default useReviews;

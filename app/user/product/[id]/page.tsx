@@ -1,11 +1,12 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { userReviews } from '@/data/data';
-import Reviews from '../../components/Reviews';
 import Comment from '../../components/Comment';
 import useProductAdmin from '@/store/productStore';
 import { useParams } from 'next/navigation';
+import useReviews from '@/store/reviewsStore';
+import Reviews from '../../components/Reviews';
+import useAuthStore from '@/store/authStore';
 const Page = () => {
     const params = useParams();
     const { id }: any = params;
@@ -26,9 +27,12 @@ const Page = () => {
         }));
     };
     const selectedSizesCount = Object.values(sizesChosen).filter(Boolean).length;
+    const [quantity, setQuantity] = useState<number>(1);
+    const { userReviews, getUsersReviews, isLoadingReviews, isUserReviewLoading, getUserReview, userReview } = useReviews();
+    const { user } = useAuthStore();
     useEffect(() => {
         if (id) getProduct(Number(id));
-    }, [id]);
+    }, [id, getProduct]);
     useEffect(() => {
         setSelectedImageIndex(0);
         setSizesChosen({
@@ -39,7 +43,16 @@ const Page = () => {
             'xl': false
         });
     }, [product]);
-    const [quantity, setQuantity] = useState<number>(1);
+    useEffect(() => {
+        if (id && user?.id) {
+            getUsersReviews(Number(id), user.id);
+        }
+    }, [id, user?.id, getUsersReviews]);
+    useEffect(() => {
+        if (product?.id && user?.id) {
+            getUserReview(product.id, user.id);
+        }
+    }, [product?.id, user?.id, getUserReview]);
     if (isLoading) {
         return (
             <div className='w-full flex items-center justify-center h-[80%]'>
@@ -128,7 +141,6 @@ const Page = () => {
                         {product.description}
                     </p>
                     <p className='px-4 py-2 bg-primary/30 text-primary font-poppins rounded-3xl'>Price: ${product.price}</p>
-
                     <div className="flex items-center justify-start gap-3">
                         <button
                             type="button"
@@ -220,17 +232,24 @@ const Page = () => {
                     User <span className="font-bold">Reviews</span>
                 </h1>
                 <div className="flex flex-col gap-5 max-h-[50rem] overflow-y-auto items-start justify-start w-full">
-                    {isAuthCommented ? <Comment /> : <div>No Comments</div>}
-                    {userReviews.map((userReview, index) => (
-                        <Reviews
-                            key={index}
-                            user={userReview.user}
-                            profilePicture={userReview.profilePic}
-                            rating={userReview.rate}
-                            isOdd={index % 2 !== 0}
-                            review={userReview.review}
-                        />
-                    ))}
+                    {
+                        !isUserReviewLoading &&
+                        <Comment userReview={userReview} />
+                    }
+                    {
+                        !isLoadingReviews &&
+                        userReviews != null &&
+                        userReviews.map((userReview: any, index: number) => (
+                            <Reviews
+                                key={index}
+                                user={userReview.displayname}
+                                profilePicture={userReview.profilepicture}
+                                rating={userReview.rating}
+                                isOdd={index % 2 !== 0}
+                                review={userReview.comment}
+                            />
+                        ))
+                    }
                 </div>
             </div>
         </div>

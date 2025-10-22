@@ -1,11 +1,12 @@
 import { sql } from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
+
 export async function DELETE(
     request: NextRequest,
-    context: { params: { userId: string; productId: string } }
+    { params }: { params: Promise<{ userId: string; productId: string }> }
 ) {
     try {
-        const { userId, productId } = await context.params;
+        const { userId, productId } = await params;
         if (!userId || !productId) {
             return NextResponse.json(
                 {
@@ -17,7 +18,7 @@ export async function DELETE(
         }
         await sql`
          DELETE FROM reviews
-         WHERE reviews.shoe_id = ${productId} AND reviews.user_id = ${userId};
+         WHERE reviews.shoe_id = ${parseInt(productId)} AND reviews.user_id = ${parseInt(userId)};
         `;
         return NextResponse.json(
             { message: `Product ${productId} for user ${userId} deleted successfully` },
@@ -26,14 +27,18 @@ export async function DELETE(
     } catch (error: unknown) {
         console.error(error instanceof Error ? error.message : error);
         return NextResponse.json(
-            { error: error instanceof Error ? error.message : error },
+            { error: error instanceof Error ? error.message : String(error) },
             { status: 400 }
         );
     }
 }
-export async function GET(request: NextRequest, context: { params: { userId: string; productId: string } }) {
+
+export async function GET(
+    request: NextRequest,
+    { params }: { params: Promise<{ userId: string; productId: string }> }
+) {
     try {
-        const { userId, productId } = await context.params;
+        const { userId, productId } = await params;
         if (!userId || !productId) {
             return NextResponse.json(
                 {
@@ -46,7 +51,7 @@ export async function GET(request: NextRequest, context: { params: { userId: str
         SELECT reviews.*,users.*
         FROM reviews INNER JOIN users ON 
         users.id = reviews.user_id
-        WHERE reviews.user_id = ${userId} AND reviews.shoe_id = ${productId};
+        WHERE reviews.user_id = ${parseInt(userId)} AND reviews.shoe_id = ${parseInt(productId)};
         `;
         return NextResponse.json(
             {
@@ -56,5 +61,9 @@ export async function GET(request: NextRequest, context: { params: { userId: str
         );
     } catch (error: unknown) {
         console.log(error instanceof Error ? error.message : error);
+        return NextResponse.json(
+            { error: error instanceof Error ? error.message : String(error) },
+            { status: 500 }
+        );
     }
 }
