@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import Comment from '../../components/Comment';
 import useProductAdmin from '@/store/productStore';
@@ -10,7 +10,6 @@ import useAuthStore from '@/store/authStore';
 const Page = () => {
     const params = useParams();
     const { id }: any = params;
-    const isAuthCommented: boolean = true;
     const { product, getProduct, isLoading } = useProductAdmin();
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [sizesChosen, setSizesChosen] = useState({
@@ -30,6 +29,56 @@ const Page = () => {
     const [quantity, setQuantity] = useState<number>(1);
     const { userReviews, getUsersReviews, isLoadingReviews, isUserReviewLoading, getUserReview, userReview } = useReviews();
     const { user } = useAuthStore();
+    const averageRating = useMemo(() => {
+        const allReviews = [];
+        if (userReviews && userReviews.length > 0) {
+            allReviews.push(...userReviews);
+        }
+        if (userReview && userReview.rating) {
+            allReviews.push(userReview);
+        }
+        if (allReviews.length === 0) return 0;
+        const totalRating = allReviews.reduce((sum: number, review: any) => {
+            return sum + (review.rating || 0);
+        }, 0);
+        return Math.round((totalRating / allReviews.length) * 10) / 10;
+    }, [userReviews, userReview]);
+    const renderStars = (rating: number) => {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        return (
+            <div className="flex items-center gap-1">
+                {[...Array(5)].map((_, index) => {
+                    if (index < fullStars) {
+                        return (
+                            <div key={index} className="text-yellow-400">
+                                ★
+                            </div>
+                        );
+                    } else if (index === fullStars && hasHalfStar) {
+                        return (
+                            <div key={index} className="text-yellow-400">
+                                ★½
+                            </div>
+                        );
+                    } else {
+                        return (
+                            <div key={index} className="text-gray-300">
+                                ★
+                            </div>
+                        );
+                    }
+                })}
+            </div>
+        );
+    };
+    const totalReviewsCount = useMemo(() => {
+        let count = userReviews?.length || 0;
+        if (userReview && userReview.rating) {
+            count += 1;
+        }
+        return count;
+    }, [userReviews, userReview]);
     useEffect(() => {
         if (id) getProduct(Number(id));
     }, [id, getProduct]);
@@ -211,12 +260,17 @@ const Page = () => {
                         )}
                     </div>
                     <div className="flex items-center justify-center gap-3">
-                        <p className="text-primary bg-primary/30 px-5 py-1 rounded-3xl text-sm">3.5</p>
+                        <p className="text-primary bg-primary/30 px-5 py-1 rounded-3xl text-sm">
+                            {averageRating > 0 ? averageRating : 'No ratings yet'}
+                        </p>
                         <div className="rating rating-md gap-3">
-                            {[...Array(5)].map((_, i) => (
-                                <input key={i} disabled={true} type="radio" name="rating-5" className="mask mask-star-2 bg-orange-400 pointer-events-none" />
-                            ))}
+                            {renderStars(averageRating)}
                         </div>
+                        {totalReviewsCount > 0 && (
+                            <p className="text-sm text-gray-500">
+                                ({totalReviewsCount} review{totalReviewsCount !== 1 ? 's' : ''})
+                            </p>
+                        )}
                     </div>
                     <button
                         type="button"
@@ -234,7 +288,7 @@ const Page = () => {
                 <div className="flex flex-col gap-5 max-h-[50rem] overflow-y-auto items-start justify-start w-full">
                     {
                         !isUserReviewLoading &&
-                        <Comment userReview={userReview} />
+                        <Comment userReview={userReview} productId={product.id} />
                     }
                     {
                         !isLoadingReviews &&

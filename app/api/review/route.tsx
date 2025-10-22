@@ -38,6 +38,19 @@ export async function POST(request: NextRequest) {
                 }
             );
         }
+        const selectedReview = await sql`
+        SELECT *  FROM reviews WHERE
+        reviews.user_id = ${userId} AND reviews.shoe_id = ${productId};
+        `;
+        if (selectedReview.length > 0) {
+            await sql`
+              UPDATE reviews SET comment = ${comment},rating=${rating}
+              WHERE reviews.user_id = ${userId} AND reviews.shoe_id = ${productId};
+            `;
+            return NextResponse.json({
+                message: 'Review updated successfully!!'
+            }, { status: 200 });
+        }
         const createdReview = await sql`
         INSERT INTO reviews (user_id,shoe_id,rating,comment)
         VALUES (${userId},${productId},${rating},${comment})
@@ -48,7 +61,7 @@ export async function POST(request: NextRequest) {
                 message: 'Review created successfully!!',
                 review: createdReview[0]
             },
-            { status: 200 }
+            { status: 201 }
         );
     } catch (error: unknown) {
         console.log(error instanceof Error ? error.message : error);

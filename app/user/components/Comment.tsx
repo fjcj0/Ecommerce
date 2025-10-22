@@ -1,17 +1,19 @@
 "use client";
 import useAuthStore from '@/store/authStore';
+import useReviews from '@/store/reviewsStore';
 import { Edit3Icon, SaveIcon, XIcon, Trash2Icon } from 'lucide-react';
 import React, { useState } from 'react';
-const Comment = ({ userReview }: { userReview: any }) => {
+const Comment = ({ userReview, productId }: { userReview: any, productId: any }) => {
     const { user: authUser } = useAuthStore();
     const [isEditing, setIsEditing] = useState(false);
     const [comment, setComment] = useState(userReview?.comment || '');
     const [rating, setRating] = useState(userReview?.rating || 0);
     const [tempRating, setTempRating] = useState(userReview?.rating || 0);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const { deleteUserReview, updateOrCreateReview, isDeletingReview, isCreatingOrUpdatingReview } = useReviews();
     if (!authUser) return null;
-    const handleSave = () => {
-        console.log('Saving review:', { comment, rating });
+    const handleSave = async () => {
+        await updateOrCreateReview(productId, authUser.id, comment, rating);
         setIsEditing(false);
     };
     const handleCancel = () => {
@@ -21,7 +23,7 @@ const Comment = ({ userReview }: { userReview: any }) => {
         setIsEditing(false);
     };
     const handleDelete = () => {
-        console.log('Deleting review');
+        deleteUserReview(productId, authUser.id);
         setShowDeleteConfirm(false);
     };
     const handleRatingChange = (newRating: number) => {
@@ -76,8 +78,9 @@ const Comment = ({ userReview }: { userReview: any }) => {
                                 {userReview && (
                                     <button
                                         type='button'
-                                        className='btn btn-circle btn-sm btn-error'
-                                        onClick={() => setShowDeleteConfirm(true)}
+                                        disabled={isDeletingReview}
+                                        className={` ${isDeletingReview ? 'opacity-50' : ''} btn btn-circle btn-sm btn-error`}
+                                        onClick={() => handleDelete()}
                                     >
                                         <Trash2Icon size={16} />
                                     </button>
@@ -145,12 +148,11 @@ const Comment = ({ userReview }: { userReview: any }) => {
                                             <input
                                                 key={n}
                                                 type="radio"
-                                                name="rating-edit"
+                                                name="rating-new"
                                                 className="mask mask-star-2 bg-orange-400 cursor-pointer"
                                                 aria-label={`${n} star`}
-                                                checked={tempRating === n}
-                                                onChange={() => handleRatingChange(n)}
-                                                onMouseEnter={() => handleStarHover(n)}
+                                                checked={rating === n}
+                                                onChange={() => setRating(n)}
                                             />
                                         ))}
                                     </div>
@@ -215,15 +217,18 @@ const Comment = ({ userReview }: { userReview: any }) => {
                         />
                         <div className="flex justify-between items-center">
                             <div className="text-sm text-gray-500">
-                                {comment.length}/500 characters
+                                {comment.length}
                             </div>
                             <button
                                 type="button"
                                 className="btn btn-primary"
                                 onClick={handleSave}
-                                disabled={!comment.trim() || rating === 0}
+                                disabled={!comment.trim() || rating === 0 || isCreatingOrUpdatingReview}
                             >
-                                Submit Review
+                                {
+                                    !isCreatingOrUpdatingReview ?
+                                        'Submit Review' : <span className='loading loading-infinity loading-md'></span>
+                                }
                             </button>
                         </div>
                     </div>

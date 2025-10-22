@@ -1,6 +1,5 @@
 import { sql } from "@/config/db";
 import { NextRequest, NextResponse } from "next/server";
-
 export async function DELETE(
     request: NextRequest,
     { params }: { params: Promise<{ userId: string; productId: string }> }
@@ -32,7 +31,6 @@ export async function DELETE(
         );
     }
 }
-
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ userId: string; productId: string }> }

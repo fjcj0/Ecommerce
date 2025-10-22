@@ -6,19 +6,24 @@ type ReviewState = {
     isLoadingReviews: boolean;
     error: string | null;
     isUserReviewLoading: boolean;
+    isCreatingOrUpdatingReview: boolean;
     userReview: any;
     reviews: any;
     userReviews: any;
+    isDeletingReview: boolean;
     getReviews: () => Promise<void>;
     deleteReviews: (ids: number[]) => Promise<void>;
     getUsersReviews: (id: number, userId?: number | null) => Promise<void>;
     getUserReview: (productId: number, userId: number) => Promise<void>;
     deleteUserReview: (productId: number, userId: number) => Promise<void>;
+    updateOrCreateReview: (productId: number, userId: number, comment: string, rating: number) => Promise<void>;
 };
 const useReviews = create<ReviewState>((set, get) => ({
     isUserReviewLoading: false,
+    isDeletingReview: false,
     isLoadingReviews: false,
     error: null,
+    isCreatingOrUpdatingReview: false,
     userReview: null,
     reviews: [],
     userReviews: null,
@@ -86,14 +91,34 @@ const useReviews = create<ReviewState>((set, get) => ({
         }
     },
     deleteUserReview: async (productId: number, userId: number) => {
-        set({ isLoadingReviews: true, error: null });
+        set({ isDeletingReview: true, error: null });
         try {
-
+            await axios.delete(`${baseUrl}/api/review/user/${userId}/${productId}`);
+            toast.success(`Review deleted successfully!!`);
+            get().getUserReview(productId, userId);
         } catch (error: unknown) {
             if (error instanceof Error) toast.error(error.message);
             else toast.error(String(error));
         } finally {
-            set({ isLoadingReviews: false });
+            set({ isDeletingReview: false });
+        }
+    },
+    updateOrCreateReview: async (productId: number, userId: number, comment: string, rating: number) => {
+        set({ isCreatingOrUpdatingReview: true });
+        try {
+            await axios.post(`${baseUrl}/api/review`, {
+                userId,
+                productId,
+                rating,
+                comment
+            });
+            toast.success(`Review created successfully!!`);
+            get().getUserReview(productId, userId);
+        } catch (error: unknown) {
+            if (error instanceof Error) toast.error(error.message);
+            else toast.error(String(error));
+        } finally {
+            set({ isCreatingOrUpdatingReview: false });
         }
     },
 }));
