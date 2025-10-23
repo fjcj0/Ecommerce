@@ -20,6 +20,7 @@ export async function GET(request: NextRequest) {
         );
     }
 }
+/*
 export async function getUserIdByEmail(email: string): Promise<string | null> {
     try {
         const users = await (clerkClient as any).users.getUserList({
@@ -32,6 +33,7 @@ export async function getUserIdByEmail(email: string): Promise<string | null> {
         throw new Error(String(error));
     }
 }
+*/
 export async function DELETE(request: NextRequest) {
     try {
         const { data } = await request.json();
@@ -43,6 +45,7 @@ export async function DELETE(request: NextRequest) {
             );
         }
         for (const id of ids) {
+            /*
             const result = await sql`SELECT email FROM users WHERE id = ${id}`;
             const email = result[0]?.email;
             if (email) {
@@ -55,6 +58,7 @@ export async function DELETE(request: NextRequest) {
                     }
                 }
             }
+            */
             await sql`DELETE FROM addresses WHERE user_id = ${id}`;
             await sql`DELETE FROM users WHERE id = ${id}`;
         }
