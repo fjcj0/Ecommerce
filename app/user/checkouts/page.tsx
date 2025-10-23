@@ -130,6 +130,13 @@ const CheckoutsPage = () => {
         await createOrder(formattedCheckouts);
         if (user?.id) await getUserCheckouts(user?.id);
     };
+    if (!user) {
+        return (
+            <div className='w-full h-[80%] flex items-center justify-center'>
+                <h1 className='text-3xl font-raleway font-bold'>You need to login</h1>
+            </div>
+        )
+    }
     if (isItemsCheckOutLoading || !isInitialized) {
         return (
             <div className='w-full min-h-screen flex flex-col items-center justify-center'>

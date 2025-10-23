@@ -2,6 +2,9 @@
 import { ReactNode, useState, useEffect } from "react";
 import Slider from "./components/Slider";
 import useSlideStore from "@/store/slideStore"; import Header from "./components/Header";
+import useAuthStore from "@/store/authStore";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 export default function ChatLayoutClient({ children }: { children: ReactNode }) {
     const [mounted, setMounted] = useState(false);
     const { isSlideOpen } = useSlideStore();
