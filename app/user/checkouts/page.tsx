@@ -6,6 +6,7 @@ import useCheckoutStore from '@/store/checkOutStore';
 import useAuthStore from '@/store/authStore';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
+import useUserOrderStore from '@/store/userOrderStore';
 interface CheckoutItem {
     id: number;
     user_id: number;
@@ -42,6 +43,7 @@ interface CheckoutItem {
 }
 const CheckoutsPage = () => {
     const { checkouts, getUserCheckouts, isItemsCheckOutLoading, deleteCheckout } = useCheckoutStore();
+    const { createOrder, isCreatingOrder } = useUserOrderStore();
     const { user } = useAuthStore();
     const [editableCheckouts, setEditableCheckouts] = useState<CheckoutItem[]>([]);
     const [isInitialized, setIsInitialized] = useState(false);
@@ -101,17 +103,32 @@ const CheckoutsPage = () => {
             return selectedSizesCount === 0;
         });
     };
-    const handleOrder = () => {
+    const handleOrder = async () => {
         if (hasItemsWithoutSizes()) {
-            toast.error('Please select sizes for all items before placing your order.');
+            toast.error("Please select sizes for all items before placing your order.");
             return;
         }
         if (editableCheckouts.length === 0) {
-            toast.error('Your cart is empty!');
+            toast.error("Your cart is empty!");
             return;
         }
-        console.log('Placing order with items:', editableCheckouts);
-        toast.success(`Order placed successfully! Total: $${calculateTotalPrice().toFixed(2)}`);
+        const formattedCheckouts = editableCheckouts.map((checkout) => ({
+            checkout_id: checkout.id,
+            user_id: checkout.user_id,
+            shoe_id: checkout.shoe_id,
+            quantity: checkout.quantity,
+            xs: checkout.sizes.xs,
+            s: checkout.sizes.s,
+            m: checkout.sizes.m,
+            l: checkout.sizes.l,
+            xl: checkout.sizes.xl,
+            final_price: parseFloat(checkout.shoes.price) *
+                (1 - parseFloat(checkout.shoes.discount || "0") / 100) *
+                checkout.quantity *
+                Object.values(checkout.sizes).filter(Boolean).length,
+        }));
+        await createOrder(formattedCheckouts);
+        if (user?.id) await getUserCheckouts(user?.id);
     };
     if (isItemsCheckOutLoading || !isInitialized) {
         return (
@@ -170,8 +187,13 @@ const CheckoutsPage = () => {
                     type='button'
                     className={`btn btn-primary font-poppins ${hasItemsWithoutSizes() ? 'btn-disabled' : ''}`}
                     onClick={handleOrder}
-                    disabled={hasItemsWithoutSizes()}
+                    disabled={hasItemsWithoutSizes() || isCreatingOrder}
                 >
+                    {
+                        isCreatingOrder ?
+                            'Creating Order...'
+                            : ''
+                    }
                     {hasItemsWithoutSizes()
                         ? 'Select Sizes First'
                         : `Place Order - $${calculateTotalPrice().toFixed(2)}`

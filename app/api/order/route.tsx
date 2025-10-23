@@ -3,36 +3,69 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
     try {
         const { checkouts } = await request.json();
-        if (!checkouts)
+        if (!checkouts || checkouts.length === 0) {
             return NextResponse.json(
-                {
-                    error: 'At least one checkout!!'
-                }, { status: 400 });
+                { error: "At least one checkout required!" },
+                { status: 400 }
+            );
+        }
+        const createdOrders = [];
+        const skippedCheckouts: number[] = [];
         for (const checkout of checkouts) {
+            const [shoe] = await sql`
+        SELECT id, quantity, available 
+        FROM shoes
+        WHERE id = ${checkout.shoe_id};
+      `;
+            if (!shoe || !shoe.available || shoe.quantity < checkout.quantity) {
+                await sql`
+          DELETE FROM checkouts
+          WHERE id = ${checkout.checkout_id};
+        `;
+                skippedCheckouts.push(checkout.checkout_id);
+                continue;
+            }
+            const totalPrice = checkout.final_price ?? 0;
+            const [order] = await sql`
+        INSERT INTO orders (
+          user_id, shoe_id, xs, s, m, l, xl,
+          quantity, final_price, status
+        )
+        VALUES (
+          ${checkout.user_id}, ${checkout.shoe_id},
+          ${checkout.xs}, ${checkout.s}, ${checkout.m},
+          ${checkout.l}, ${checkout.xl},
+          ${checkout.quantity}, ${totalPrice}, 'pending'
+        )
+        RETURNING *;
+      `;
+            createdOrders.push(order);
             await sql`
-                INSERT INTO orders (user_id, shoe_id, xs, s, m, l, xl, quantity, final_price, status)
-                VALUES (${checkout.user_id}, ${checkout.shoe_id}, ${checkout.xs}, ${checkout.s}, ${checkout.m}, ${checkout.l}, ${checkout.xl}, ${checkout.quantity}, ${checkout.final_price}, 'pending')
-                RETURNING *;
-                `;
+        UPDATE shoes
+        SET available = available - ${checkout.quantity}
+        WHERE id = ${checkout.shoe_id};
+      `;
             await sql`
-                 DELETE FROM checkouts 
-                 WHERE id = ${checkout.checkout_id};
-                `;
+        DELETE FROM checkouts WHERE id = ${checkout.checkout_id};
+      `;
         }
         return NextResponse.json(
             {
-                message: 'Orders are sent successfully!!'
-            }, { status: 201 }
-        )
+                message: "Orders processed successfully!",
+                createdOrders,
+                skippedCheckouts,
+            },
+            { status: 201 }
+        );
     } catch (error: unknown) {
-        console.log(error instanceof Error ? error.message : error);
+        console.error(error instanceof Error ? error.message : error);
         return NextResponse.json(
-            {
-                error: error instanceof Error ? error.message : error
-            }, { status: 500 }
+            { error: error instanceof Error ? error.message : error },
+            { status: 500 }
         );
     }
 }
+
 export async function DELETE(request: NextRequest) {
     try {
         const { ids } = await request.json();
