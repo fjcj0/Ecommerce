@@ -79,8 +79,7 @@ export async function GET() {
         l BOOLEAN NULL,
         xl BOOLEAN NULL,
         quantity INTEGER DEFAULT 1 CHECK (quantity > 0),
-        total_amount DECIMAL(10,2),
-        price DECIMAL(10,2),
+        final_price DECIMAL(10,2),
         status TEXT DEFAULT 'pending',
         created_at TIMESTAMP DEFAULT NOW(),
         updated_at TIMESTAMP DEFAULT NOW()

@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sql } from '@/config/db';
 export async function GET(
     request: NextRequest,
-    { params }: { params: { userId: string } }
+    { params }: { params: Promise<{ userId: string }> }
 ) {
     try {
-        const { userId } = params;
+        const { userId } = await params;
         console.log('Fetching checkouts for user:', userId);
         if (!userId) {
             return NextResponse.json(

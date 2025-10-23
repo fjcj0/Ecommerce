@@ -6,19 +6,16 @@ export async function DELETE(
 ) {
     try {
         const { checkoutId } = await params;
-
         if (!checkoutId) {
             return NextResponse.json(
                 { error: 'CheckoutId is required!!' },
                 { status: 400 }
             );
         }
-
         await sql`
       DELETE FROM checkouts
       WHERE checkouts.id = ${checkoutId};
     `;
-
         return NextResponse.json(
             { message: 'CheckOut Deleted Successfully!!' },
             { status: 200 }

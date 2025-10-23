@@ -3,7 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
     try {
         const reviews = await sql`
-            SELECT reviews.*, users.*, shoes.*, 
+            SELECT DISTINCT ON (reviews.id) 
+                reviews.*, 
+                users.displayname,
+                users.profilepicture,
+                shoes.title,
+                shoes.description,
                 (SELECT url 
                  FROM images 
                  WHERE images.shoe_id = shoes.id 
@@ -12,6 +17,7 @@ export async function GET(request: NextRequest) {
             FROM reviews
             INNER JOIN users ON reviews.user_id = users.id
             INNER JOIN shoes ON reviews.shoe_id = shoes.id
+            ORDER BY reviews.id
         `;
         return NextResponse.json(
             { reviews },

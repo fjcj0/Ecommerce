@@ -4,9 +4,9 @@ import { clerkClient } from '@clerk/nextjs/server';
 export async function GET(request: NextRequest) {
     try {
         const users = await sql`
-        SELECT * FROM users INNER JOIN addresses ON
+        SELECT * FROM users FULL JOIN addresses ON
         addresses.user_id = users.id;
-        `
+        `;
         return NextResponse.json(
             {
                 users: users
