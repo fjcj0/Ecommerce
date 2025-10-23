@@ -7,6 +7,7 @@ import { useParams } from 'next/navigation';
 import useReviews from '@/store/reviewsStore';
 import Reviews from '../../components/Reviews';
 import useAuthStore from '@/store/authStore';
+import useCheckoutStore from '@/store/checkOutStore';
 const Page = () => {
     const params = useParams();
     const { id }: any = params;
@@ -23,6 +24,7 @@ const Page = () => {
     const { user } = useAuthStore();
     const [quantity, setQuantity] = useState<number>(1);
     const [hasLoaded, setHasLoaded] = useState(false);
+    const { createCheckout, isCreatingCheckout } = useCheckoutStore();
     const handleOnSelectSize = useCallback((size: string) => {
         setSizesChosen(prevState => ({
             ...prevState,
@@ -30,6 +32,7 @@ const Page = () => {
         }));
     }, []);
     const selectedSizesCount = Object.values(sizesChosen).filter(Boolean).length;
+    const totalQuantity = selectedSizesCount * quantity;
     const averageRating = useMemo(() => {
         const allReviews = [];
         if (userReviews && userReviews.length > 0) {
@@ -123,6 +126,23 @@ const Page = () => {
             clearProduct();
         };
     }, [clearError, clearProduct]);
+    const onCreateCheckout = async () => {
+        try {
+            await createCheckout(
+                Number(user?.id),
+                id,
+                sizesChosen.xs,
+                sizesChosen.s,
+                sizesChosen.m,
+                sizesChosen.l,
+                sizesChosen.xl,
+                totalQuantity
+            );
+            await getProduct(id, Number(user?.id));
+        } catch (error: unknown) {
+            console.log(error instanceof Error ? error.message : error);
+        }
+    }
     if (isLoading || !hasLoaded) {
         return (
             <div className='w-full flex items-center justify-center h-[80vh]'>
@@ -135,9 +155,8 @@ const Page = () => {
             <div className='w-full flex items-center justify-center h-[80vh]'>
                 <div className="text-center">
                     <h1 className='font-raleway font-bold lg:text-6xl md:text-4xl text-2xl text-red-500 mb-4'>
-                        Error Loading Product
+                        Error 404 Page Not Found
                     </h1>
-                    <p className="text-lg text-gray-600">{String(error)}</p>
                 </div>
             </div>
         );
@@ -207,7 +226,7 @@ const Page = () => {
                 <div className="flex flex-col items-start justify-center gap-5">
                     <div className="flex items-start justify-start gap-3 font-raleway font-medium">
                         <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm">
-                            Quantity: {product.quantity}
+                            Stock: {product.quantity}
                         </p>
                         <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm">
                             {product.available > 0 ? 'Available' : 'Not Available'}
@@ -218,25 +237,32 @@ const Page = () => {
                         {product.description}
                     </p>
                     <p className='px-4 py-2 bg-primary/30 text-primary font-poppins rounded-3xl'>Price: ${product.price}</p>
-                    <div className="flex items-center justify-start gap-3">
-                        <button
-                            type="button"
-                            className="btn btn-circle"
-                            onClick={() => {
-                                if (quantity > 1) {
-                                    setQuantity(quantity - 1);
-                                }
-                            }}
-                            disabled={quantity <= 1}
-                        >-</button>
-                        <p className="text-primary font-bold bg-primary/30 px-2 py-2 w-[3rem] h-[3rem] flex items-center justify-center rounded-full">{quantity}</p>
-                        <button
-                            type="button"
-                            className="btn btn-circle"
-                            onClick={() => setQuantity(quantity + 1)}
-                        >+</button>
+                    <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-start gap-3">
+                            <button
+                                type="button"
+                                className="btn btn-circle"
+                                onClick={() => {
+                                    if (quantity > 1) {
+                                        setQuantity(quantity - 1);
+                                    }
+                                }}
+                                disabled={quantity <= 1}
+                            >-</button>
+                            <div className="flex flex-col items-center gap-1">
+                                <p className="text-primary font-bold bg-primary/30 px-2 py-2 w-[3rem] h-[3rem] flex items-center justify-center rounded-full">
+                                    {quantity}
+                                </p>
+                            </div>
+                            <button
+                                type="button"
+                                className="btn btn-circle"
+                                onClick={() => setQuantity(quantity + 1)}
+                            >+</button>
+                        </div>
                     </div>
                     <div className="flex flex-col gap-3">
+                        <h3 className="text-lg font-semibold text-primary">Select Sizes:</h3>
                         <div className="grid grid-cols-3 gap-3">
                             {product.xs !== false && (
                                 <button
@@ -303,13 +329,15 @@ const Page = () => {
                     </div>
                     <button
                         type="button"
-                        className="btn btn-primary"
-                        disabled={selectedSizesCount === 0 || product.available === 0 || isUserCheckout == true}
+                        className="btn btn-primary w-full"
+                        onClick={onCreateCheckout}
+                        disabled={selectedSizesCount === 0 || product.available === 0 || isUserCheckout == true || isCreatingCheckout}
                     >
-                        {isUserCheckout == true ? 'Already in Checkout' :
-                            selectedSizesCount === 0 ? 'Select Sizes' :
-                                product.available === 0 ? 'Out of Stock' :
-                                    'CheckOut'}
+                        {isCreatingCheckout ? 'Creating Checkout...' :
+                            isUserCheckout == true ? 'Already in Checkout' :
+                                selectedSizesCount === 0 ? 'Select Sizes' :
+                                    product.available === 0 ? 'Out of Stock' :
+                                        `CheckOut (${totalQuantity} items)`}
                     </button>
                 </div>
             </div>
