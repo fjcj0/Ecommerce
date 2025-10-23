@@ -31,6 +31,7 @@ const Page = () => {
             [size.toLowerCase()]: !prevState[size.toLowerCase() as keyof typeof prevState]
         }));
     }, []);
+
     const selectedSizesCount = Object.values(sizesChosen).filter(Boolean).length;
     const totalQuantity = selectedSizesCount * quantity;
     const averageRating = useMemo(() => {
@@ -87,6 +88,9 @@ const Page = () => {
         if (id && user?.id) {
             setHasLoaded(false);
             getProduct(Number(id), Number(user.id));
+        } else if (!user) {
+
+            setHasLoaded(true);
         }
     }, [id, user?.id]);
     useEffect(() => {
@@ -107,6 +111,7 @@ const Page = () => {
             setQuantity(1);
         }
     }, [product]);
+
     useEffect(() => {
         if (id && user?.id && product) {
             getUsersReviews(Number(id), user.id);
@@ -127,9 +132,10 @@ const Page = () => {
         };
     }, [clearError, clearProduct]);
     const onCreateCheckout = async () => {
+        if (!user) return;
         try {
             await createCheckout(
-                Number(user?.id),
+                Number(user.id),
                 id,
                 sizesChosen.xs,
                 sizesChosen.s,
@@ -138,10 +144,17 @@ const Page = () => {
                 sizesChosen.xl,
                 totalQuantity
             );
-            await getProduct(id, Number(user?.id));
+            await getProduct(id, Number(user.id));
         } catch (error: unknown) {
             console.log(error instanceof Error ? error.message : error);
         }
+    }
+    if (!user) {
+        return (
+            <div className='w-full flex items-center justify-center h-[80vh]'>
+                <h1 className='font-bold text-3xl'>You need to login!!</h1>
+            </div>
+        );
     }
     if (isLoading || !hasLoaded) {
         return (

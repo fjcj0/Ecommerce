@@ -3,7 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
-const Card = ({ name, image, description, to, discount }: cardProps) => {
+const Card = ({ name, image, description, to, discount }: {
+    name: any,
+    image: any,
+    description: any,
+    to: any,
+    discount: any,
+}) => {
     return (
         <div className='sm:w-[35rem] w-[27rem] h-auto flex justify-start items-start'>
             <div className='w-1/2 flex h-full items-start justify-end'>
