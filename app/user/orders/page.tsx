@@ -1,16 +1,49 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Image from 'next/image';
 import useUserOrderStore from '@/store/userOrderStore';
 import useAuthStore from '@/store/authStore';
 const Page = () => {
     const { orders, getOrders, isLoadingOrders } = useUserOrderStore();
     const { user } = useAuthStore();
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
     useEffect(() => {
         if (user?.id) {
             getOrders(Number(user?.id));
         }
     }, [user?.id, getOrders]);
+    const filteredOrders = useMemo(() => {
+        const orderList = Array.isArray(orders) ? orders : [];
+        if (!searchTerm.trim()) return orderList;
+        return orderList.filter(order =>
+            order.title?.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [orders, searchTerm]);
+    const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const currentOrders = filteredOrders.slice(startIndex, startIndex + itemsPerPage);
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+    };
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        for (let i = startPage; i <= endPage; i++) {
+            pageNumbers.push(i);
+        }
+        return pageNumbers;
+    };
     if (isLoadingOrders) {
         return (
             <div className='w-full h-full flex items-center justify-center'>
@@ -23,7 +56,13 @@ const Page = () => {
         <div className="p-3 font-poppins h-full flex flex-col items-start justify-start gap-5">
             <div className="w-full flex justify-between items-center">
                 <label className="input input-bordered flex items-center gap-2 w-full max-w-md">
-                    <input type="text" className="grow" placeholder="Search" />
+                    <input
+                        type="text"
+                        className="grow"
+                        placeholder="Search by product name..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                    />
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 16 16"
@@ -46,14 +85,13 @@ const Page = () => {
                                 <th>Product</th>
                                 <th>Price</th>
                                 <th>Sizes</th>
-                                <th></th>
-                                <th>quantity</th>
-                                <th>Deliver Status</th>
+                                <th>Quantity</th>
+                                <th>Delivery Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {orderList.length > 0 ? (
-                                orderList.map((order: any, index: number) => (
+                            {currentOrders.length > 0 ? (
+                                currentOrders.map((order: any, index: number) => (
                                     <tr key={order.id || index}>
                                         <td>
                                             <div className="flex items-center gap-3">
@@ -69,7 +107,7 @@ const Page = () => {
                                             </div>
                                         </td>
                                         <td>${order.final_price}</td>
-                                        <td colSpan={2}>
+                                        <td>
                                             {[
                                                 order.xs && 'xs',
                                                 order.s && 's',
@@ -96,8 +134,8 @@ const Page = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="text-center py-8">
-                                        No orders found
+                                    <td colSpan={5} className="text-center py-8">
+                                        {searchTerm ? 'No orders found matching your search' : 'No orders found'}
                                     </td>
                                 </tr>
                             )}
@@ -105,12 +143,37 @@ const Page = () => {
                     </table>
                 </div>
             </div>
-            <div className="w-full flex items-center justify-center">
-                <div className="join flex">
-                    <button className="join-item btn btn-outline">Previous</button>
-                    <button className="join-item btn btn-outline">Next</button>
+            {totalPages > 1 && (
+                <div className="w-full flex items-center justify-center">
+                    <div className="join">
+                        {/* Previous Button */}
+                        <button
+                            className="join-item btn btn-outline"
+                            onClick={() => handlePageChange(currentPage - 1)}
+                            disabled={currentPage === 1}
+                        >
+                            Previous
+                        </button>
+                        {getPageNumbers().map(page => (
+                            <button
+                                key={page}
+                                className={`join-item btn btn-outline ${currentPage === page ? 'btn-active' : ''
+                                    }`}
+                                onClick={() => handlePageChange(page)}
+                            >
+                                {page}
+                            </button>
+                        ))}
+                        <button
+                            className="join-item btn btn-outline"
+                            onClick={() => handlePageChange(currentPage + 1)}
+                            disabled={currentPage === totalPages}
+                        >
+                            Next
+                        </button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
