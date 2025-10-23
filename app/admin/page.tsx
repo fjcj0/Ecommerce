@@ -6,6 +6,7 @@ import ProductsChart from "../charts/AdminCharts/ProductsChart";
 import TopProduct from "./components/TopProduct";
 import useAdminDashboardInfoStore from "@/store/adminDashboardStore";
 import { DollarSign, Box, Users, ListOrderedIcon } from "lucide-react";
+import Link from "next/link";
 const Page = () => {
     const {
         getDashboardInformation,
@@ -124,7 +125,7 @@ const Page = () => {
                     <div className="w-full flex flex-col justify-center items-center p-3 bg-base-300/80 rounded-lg">
                         <div className="flex justify-between items-center w-full">
                             <h1 className="font-bold">Top Products</h1>
-                            <button type="button" className="btn btn-outline">View All</button>
+                            <Link href={'/admin/products'} className="btn btn-outline">View All</Link>
                         </div>
                         <div className="w-full flex flex-col items-start my-3 font-poppins max-h-56 gap-3 overflow-y-auto">
                             {topProducts.length ? (

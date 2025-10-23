@@ -12,7 +12,6 @@ const TopProduct = ({ name, increase, decrease, image, sold }: topProductProps) 
                 </div>
                 <div className='flex flex-col items-start justify-start '>
                     <h3>{name}</h3>
-                    <p className='text-primary/30'>{sold}</p>
                 </div>
             </div>
             {increase && <div className='flex items-center justify-center'>
