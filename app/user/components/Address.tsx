@@ -14,14 +14,28 @@ const Address = () => {
     const [country, setCountry] = useState('');
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const fetchData = async () => {
-        if (!user?.id) return;
-        setLoading(true);
+    const [countriesLoading, setCountriesLoading] = useState(true);
+    const fetchCountries = async () => {
         try {
-            const countryResponse = await axios.get(`${baseUrl}/api/countries`);
-            setCountries(countryResponse.data.map((c: any) => c.name));
-            const addressResponse = await axios.get(`${baseUrl}/api/user-address/${user.id}`);
-            const data = addressResponse.data.address;
+            setCountriesLoading(true);
+            const response = await axios.get(`${baseUrl}/api/countries`);
+            if (response.data && Array.isArray(response.data)) {
+                const countryNames = response.data.map((c: any) => c.name || c);
+                setCountries(countryNames);
+            }
+        } catch (error) {
+            console.log('Failed to fetch countries:', error);
+            toast.error('Failed to load countries list');
+            setCountries(['United States', 'Canada', 'United Kingdom']);
+        } finally {
+            setCountriesLoading(false);
+        }
+    };
+    const fetchAddress = async () => {
+        if (!user?.id) return;
+        try {
+            const response = await axios.get(`${baseUrl}/api/user-address/${user.id}`);
+            const data = response.data.address;
             if (data) {
                 setStreet(data.street || '');
                 setCity(data.city || '');
@@ -29,12 +43,18 @@ const Address = () => {
                 setZip(data.zip || '');
                 setCountry(data.country || '');
             }
-        } catch (err) {
-            toast.error('Failed to fetch data');
-            console.error(err);
-        } finally {
-            setLoading(false);
+        } catch (error) {
+            console.error('Failed to fetch address:', error);
         }
+    };
+    const fetchData = async () => {
+        if (!user?.id) return;
+        setLoading(true);
+        await Promise.all([
+            fetchCountries(),
+            fetchAddress()
+        ]);
+        setLoading(false);
     };
     useEffect(() => {
         fetchData();
@@ -51,11 +71,20 @@ const Address = () => {
         setSubmitting(true);
         try {
             await axios.put(`${baseUrl}/api/user-address`, {
-                data: { userId: user.id, street, city, state, zip, country }
+                data: {
+                    userId: user.id,
+                    street,
+                    city,
+                    state,
+                    zip,
+                    country
+                }
             });
             toast.success('Address updated successfully!');
         } catch (err: any) {
-            toast.error(err instanceof Error ? err.message : 'Failed to update address');
+            console.error('Address update error:', err);
+            const errorMessage = err.response?.data?.error || err.message || 'Failed to update address';
+            toast.error(errorMessage);
         } finally {
             setSubmitting(false);
         }
@@ -63,63 +92,93 @@ const Address = () => {
     if (loading) {
         return (
             <div className="w-full flex justify-center items-center h-64">
-                <span className='loading loading-infinity loading-md'></span>
+                <span className='loading loading-infinity loading-lg'></span>
+                <span className='ml-2'>Loading address...</span>
             </div>
         );
     }
     return (
-        <div className="mb-10 w-full flex flex-col items-center justify-center">
-            <h1 className="text-5xl self-start font-bold font-raleway">Address</h1>
-            <div className="flex flex-col gap-3 w-full mt-8">
-                <div className="w-full grid grid-cols-1 md:grid-cols-2 px-3 gap-3">
-                    <input
-                        value={street}
-                        onChange={(e) => setStreet(e.target.value)}
-                        type="text"
-                        className="bg-primary text-base-300 outline-base-content px-3 py-2 rounded-lg placeholder:text-base-300 font-raleway"
-                        placeholder="Street..."
-                    />
-                    <input
-                        value={city}
-                        onChange={(e) => setCity(e.target.value)}
-                        type="text"
-                        className="bg-primary text-base-300 outline-base-content px-3 py-2 rounded-lg placeholder:text-base-300 font-raleway"
-                        placeholder="City"
-                    />
+        <div className="mb-10  flex flex-col items-start justify-start bg-base-300 p-3 rounded-xl">
+            <h1 className="text-3xl md:text-5xl self-start font-bold font-raleway mb-3">Shipping Address</h1>
+            <div className="flex flex-col gap-4 w-full max-w-4xl">
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">Street Address</label>
+                        <input
+                            value={street}
+                            onChange={(e) => setStreet(e.target.value)}
+                            type="text"
+                            className="input input-bordered w-full"
+                            placeholder="Enter your street address..."
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">City</label>
+                        <input
+                            value={city}
+                            onChange={(e) => setCity(e.target.value)}
+                            type="text"
+                            className="input input-bordered w-full"
+                            placeholder="Enter your city"
+                        />
+                    </div>
                 </div>
-                <div className="w-full grid md:grid-cols-2 grid-cols-1 px-3 gap-3">
-                    <input
-                        value={state}
-                        onChange={(e) => setState(e.target.value)}
-                        type="text"
-                        className="bg-primary text-base-300 outline-base-content px-3 py-2 rounded-lg placeholder:text-base-300 font-raleway"
-                        placeholder="State"
-                    />
-                    <input
-                        value={zip}
-                        onChange={(e) => setZip(e.target.value)}
-                        type="text"
-                        className="bg-primary text-base-300 outline-base-content px-3 py-2 rounded-lg placeholder:text-base-300 font-raleway"
-                        placeholder="Zip..."
-                    />
-                    <select
-                        value={country}
-                        className="bg-primary text-base-300 outline-base-content px-3 py-2 rounded-lg font-raleway"
-                        onChange={(e) => setCountry(e.target.value)}
-                    >
-                        <option value="" disabled>Select Country</option>
-                        {countries.map((name, idx) => (
-                            <option key={idx} value={name}>{name}</option>
-                        ))}
-                    </select>
-                    <div className="flex items-start justify-normal">
+
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">State/Province</label>
+                        <input
+                            value={state}
+                            onChange={(e) => setState(e.target.value)}
+                            type="text"
+                            className="input input-bordered w-full"
+                            placeholder="Enter your state or province"
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">ZIP/Postal Code</label>
+                        <input
+                            value={zip}
+                            onChange={(e) => setZip(e.target.value)}
+                            type="text"
+                            className="input input-bordered w-full"
+                            placeholder="Enter your ZIP or postal code"
+                        />
+                    </div>
+                </div>
+                <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                        <label className="font-semibold">Country</label>
+                        <select
+                            value={country}
+                            className="select select-bordered w-full"
+                            onChange={(e) => setCountry(e.target.value)}
+                            disabled={countriesLoading}
+                        >
+                            <option value="">Select your country</option>
+                            {countries.map((name, idx) => (
+                                <option key={idx} value={name}>{name}</option>
+                            ))}
+                        </select>
+                        {countriesLoading && (
+                            <span className="text-sm text-gray-500">Loading countries...</span>
+                        )}
+                    </div>
+                    <div className="flex items-end">
                         <button
                             onClick={onSubmit}
                             type="button"
-                            className="btn btn-primary font-raleway font-bold self-start"
-                            disabled={submitting}
+                            className="btn btn-primary font-raleway font-bold px-8"
+                            disabled={submitting || !street || !city || !state || !zip || !country}
                         >
-                            {submitting ? 'Submitting...' : 'Edit'}
+                            {submitting ? (
+                                <>
+                                    <span className="loading loading-spinner loading-sm"></span>
+                                    Updating...
+                                </>
+                            ) : (
+                                'Save Address'
+                            )}
                         </button>
                     </div>
                 </div>

@@ -8,8 +8,8 @@ type checkOutStoreProps = {
     isDeletingCheckout: boolean,
     checkouts: any,
     isCreatingCheckout: boolean,
-    getUserCheckouts: (userId: number, productId: number) => Promise<void>,
-    deleteCheckout: (userId: number, productId: number) => Promise<void>,
+    getUserCheckouts: (userId: number) => Promise<void>,
+    deleteCheckout: (checkoutId: number) => Promise<void>,
     createCheckout: (userId: number, productId: number, xs: boolean, s: boolean, m: boolean, l: boolean, xl: boolean, quantity: number) => Promise<void>,
 }
 const useCheckoutStore = create<checkOutStoreProps>((set, get) => ({
@@ -18,21 +18,28 @@ const useCheckoutStore = create<checkOutStoreProps>((set, get) => ({
     isItemsCheckOutLoading: false,
     isDeletingCheckout: false,
     checkouts: null,
-    getUserCheckouts: async (userId: number, productId: number) => {
+    getUserCheckouts: async (userId: number) => {
         set({ isItemsCheckOutLoading: true });
         try {
-            const response = await axios.get(`${baseUrl}/api/checkout/user/${productId}/${userId}`);
-            set({ checkouts: response.data.checkouts });
+            const response = await axios.get(`${baseUrl}/api/checkout/user-checkout/${userId}`);
+            console.log('API Response:', response.data);
+            if (response.data.success) {
+                set({ checkouts: response.data.checkouts });
+            } else {
+                console.error('API returned error:', response.data.error);
+                toast.error(response.data.error || 'Failed to fetch checkouts');
+            }
         } catch (error: unknown) {
-            console.log(error instanceof Error ? error.message : error);
+            console.log('API Error:', error instanceof Error ? error.message : error);
+            toast.error('Failed to load checkouts');
         } finally {
             set({ isItemsCheckOutLoading: false });
         }
     },
-    deleteCheckout: async (userId: number, productId: number) => {
+    deleteCheckout: async (checkoutId: number) => {
         set({ isDeletingCheckout: true });
         try {
-            await axios.delete(`${baseUrl}/api/checkout/user/${productId}/${userId}`);
+            await axios.delete(`${baseUrl}/api/checkout/${checkoutId}`);
             toast.success(`Checkout deleted successfully!!`);
         } catch (error: unknown) {
             console.log(error instanceof Error ? error.message : error);
