@@ -1,13 +1,14 @@
 "use client";
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { Trash } from 'lucide-react';
 import Image from 'next/image';
 import useAdminStoreOrder from '@/store/adminOrderStore';
 const Page = () => {
-    const { orders, getOrders, isLoadingOrders } = useAdminStoreOrder();
+    const { orders, getOrders, isLoadingOrders, isDeletingOrder, deleteOrders, changeDeliverStatus, isChangingDeliverStatus } = useAdminStoreOrder();
     const [currentPage, setCurrentPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedOrders, setSelectedOrders] = useState<string[]>([]);
+    const [changingStatusOrderId, setChangingStatusOrderId] = useState<number | null>(null);
     const itemsPerPage = 10;
     useEffect(() => {
         getOrders();
@@ -52,14 +53,35 @@ const Page = () => {
     const isAllSelected = currentOrders.length > 0 &&
         currentOrders.every((order: any) => selectedOrders.includes(order.id));
     const isSomeSelected = currentOrders.some((order: any) => selectedOrders.includes(order.id));
-    const handleDeleteSelected = () => {
+    const handleDeleteSelected = async () => {
         if (selectedOrders.length === 0) return;
-        console.log('Deleting orders:', selectedOrders);
+        const orderIdsToDelete = selectedOrders.map(id => Number(id));
+        console.log('Deleting orders:', orderIdsToDelete);
+        await deleteOrders(orderIdsToDelete);
         setSelectedOrders([]);
+        getOrders();
     };
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
         setSelectedOrders([]);
+    };
+    const handleOnChangeDeliverStatus = async (
+        orderId: number,
+        userId: number,
+        shoeId: number,
+        status: string,
+        quantity: number,
+        price: number
+    ) => {
+        setChangingStatusOrderId(orderId);
+        try {
+            await changeDeliverStatus(userId, shoeId, orderId, status, quantity, price);
+            getOrders();
+        } catch (error) {
+            console.error('Failed to change deliver status:', error);
+        } finally {
+            setChangingStatusOrderId(null);
+        }
     };
     if (isLoadingOrders) {
         return (
@@ -100,9 +122,13 @@ const Page = () => {
                         type='button'
                         className='btn btn-circle bg-primary/30 hover:bg-primary hover:text-base-300'
                         onClick={handleDeleteSelected}
-                        disabled={selectedOrders.length === 0}
+                        disabled={selectedOrders.length === 0 || isDeletingOrder}
                     >
-                        <Trash size={23} />
+                        {isDeletingOrder ? (
+                            <span className='loading loading-spinner loading-sm'></span>
+                        ) : (
+                            <Trash size={23} />
+                        )}
                     </button>
                 </div>
             </div>
@@ -136,72 +162,97 @@ const Page = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {currentOrders.map((order: any, index: number) => (
-                                <tr key={order.id || index} className={selectedOrders.includes(order.id) ? 'bg-base-200' : ''}>
-                                    <th>
-                                        <label>
-                                            <input
-                                                type="checkbox"
-                                                className="checkbox"
-                                                checked={selectedOrders.includes(order.id)}
-                                                onChange={() => handleOrderSelect(order.id)}
-                                            />
-                                        </label>
-                                    </th>
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="avatar sm:block hidden">
-                                                <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
-                                                    <Image
-                                                        src={order.profilePicture || order.profilepicture || '/default-avatar.png'}
-                                                        alt={order.displayName || order.displayname || 'User'}
-                                                        width={50}
-                                                        height={50}
-                                                        className="object-cover"
-                                                    />
+                            {currentOrders.map((order: any, index: number) => {
+                                const userId = order.user_id || order.userId;
+                                const shoeId = order.shoe_id || order.shoeId;
+                                const quantity = order.quantity || 0;
+                                const price = order.final_price || order.price;
+                                const status = order.status || 'pending';
+                                return (
+                                    <tr key={order.id || index} className={selectedOrders.includes(order.id) ? 'bg-base-200' : ''}>
+                                        <th>
+                                            <label>
+                                                <input
+                                                    type="checkbox"
+                                                    className="checkbox"
+                                                    checked={selectedOrders.includes(order.id)}
+                                                    onChange={() => handleOrderSelect(order.id)}
+                                                />
+                                            </label>
+                                        </th>
+                                        <td>
+                                            <div className="flex items-center gap-3">
+                                                <div className="avatar sm:block hidden">
+                                                    <div className="w-[50px] h-[50px] rounded-full overflow-hidden">
+                                                        <Image
+                                                            src={order.profilePicture || order.profilepicture || '/default-avatar.png'}
+                                                            alt={order.displayName || order.displayname || 'User'}
+                                                            width={50}
+                                                            height={50}
+                                                            className="object-cover"
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold">{order.displayname}</div>
                                                 </div>
                                             </div>
-                                            <div>
-                                                <div className="font-bold">{order.displayname}</div>
+                                        </td>
+                                        <td>
+                                            <div className="flex items-center gap-3">
+                                                <div className="avatar sm:block hidden">
+                                                    <Image
+                                                        src={order.image_url || order.imageUrl || '/default-product.png'}
+                                                        alt={order.title || 'Product'}
+                                                        width={50}
+                                                        height={50}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold">{order.title || 'Untitled Product'}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div className="flex items-center gap-3">
-                                            <div className="avatar sm:block hidden">
-                                                <Image
-                                                    src={order.image_url || order.imageUrl || '/default-product.png'}
-                                                    alt={order.title || 'Product'}
-                                                    width={50}
-                                                    height={50}
-                                                />
-                                            </div>
-                                            <div>
-                                                <div className="font-bold">{order.title || 'Untitled Product'}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>${order.final_price}</td>
-                                    <td>{order.available ? 'Yes' : 'No'}</td>
-                                    <td>{order.quantity || 0}</td>
-                                    <td>
-                                        {[
-                                            order.xs && 'xs',
-                                            order.s && 's',
-                                            order.m && 'm',
-                                            order.l && 'l',
-                                            order.xl && 'xl'
-                                        ].filter(Boolean).join(', ') || 'None'}
-                                    </td>
-                                    <td>
-                                        <select className="select select-bordered select-sm w-full max-w-xs" defaultValue={order.status || 'pending'}>
-                                            <option value='pending'>Pending</option>
-                                            <option value='delivered'>Delivered</option>
-                                            <option value="failed">Failed</option>
-                                        </select>
-                                    </td>
-                                </tr>
-                            ))}
+                                        </td>
+                                        <td>${price}</td>
+                                        <td>{order.available ? 'Yes' : 'No'}</td>
+                                        <td>{quantity}</td>
+                                        <td>
+                                            {[
+                                                order.xs && 'xs',
+                                                order.s && 's',
+                                                order.m && 'm',
+                                                order.l && 'l',
+                                                order.xl && 'xl'
+                                            ].filter(Boolean).join(', ') || 'None'}
+                                        </td>
+                                        <td>
+                                            <select
+                                                className="select select-bordered select-sm w-full max-w-xs"
+                                                value={status}
+                                                onChange={(e) => handleOnChangeDeliverStatus(
+                                                    Number(order.id),
+                                                    Number(userId),
+                                                    Number(shoeId),
+                                                    e.target.value,
+                                                    quantity,
+                                                    price
+                                                )}
+                                                disabled={status === 'delivered' || changingStatusOrderId === order.id}
+                                            >
+                                                {changingStatusOrderId === order.id ? (
+                                                    <option>Updating...</option>
+                                                ) : (
+                                                    <>
+                                                        <option value='pending'>Pending</option>
+                                                        <option value='delivered'>Delivered</option>
+                                                        <option value="failed">Failed</option>
+                                                    </>
+                                                )}
+                                            </select>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
