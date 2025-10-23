@@ -1,5 +1,5 @@
 import { LucideIcon } from "lucide-react";
-export const baseUrl = 'http://localhost:3000';
+export const baseUrl = process.env.NEXT_PUBLIC_NODE_ENV != 'development' ? '' : 'http://localhost:3000';
 export interface cardProps {
     name: string;
     image: string;
