@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import Comment from '../../components/Comment';
 import useProductAdmin from '@/store/productStore';
@@ -10,7 +10,7 @@ import useAuthStore from '@/store/authStore';
 const Page = () => {
     const params = useParams();
     const { id }: any = params;
-    const { product, getProduct, isLoading } = useProductAdmin();
+    const { product, getProduct, isLoading, isUserCheckout, error, clearError, clearProduct } = useProductAdmin();
     const [selectedImageIndex, setSelectedImageIndex] = useState(0);
     const [sizesChosen, setSizesChosen] = useState({
         'xs': false,
@@ -19,16 +19,17 @@ const Page = () => {
         'l': false,
         'xl': false
     });
-    const handleOnSelectSize = (size: string) => {
+    const { userReviews, getUsersReviews, isLoadingReviews, isUserReviewLoading, getUserReview, userReview } = useReviews();
+    const { user } = useAuthStore();
+    const [quantity, setQuantity] = useState<number>(1);
+    const [hasLoaded, setHasLoaded] = useState(false);
+    const handleOnSelectSize = useCallback((size: string) => {
         setSizesChosen(prevState => ({
             ...prevState,
             [size.toLowerCase()]: !prevState[size.toLowerCase() as keyof typeof prevState]
         }));
-    };
+    }, []);
     const selectedSizesCount = Object.values(sizesChosen).filter(Boolean).length;
-    const [quantity, setQuantity] = useState<number>(1);
-    const { userReviews, getUsersReviews, isLoadingReviews, isUserReviewLoading, getUserReview, userReview } = useReviews();
-    const { user } = useAuthStore();
     const averageRating = useMemo(() => {
         const allReviews = [];
         if (userReviews && userReviews.length > 0) {
@@ -43,7 +44,7 @@ const Page = () => {
         }, 0);
         return Math.round((totalRating / allReviews.length) * 10) / 10;
     }, [userReviews, userReview]);
-    const renderStars = (rating: number) => {
+    const renderStars = useCallback((rating: number) => {
         const fullStars = Math.floor(rating);
         const hasHalfStar = rating % 1 >= 0.5;
         return (
@@ -71,7 +72,7 @@ const Page = () => {
                 })}
             </div>
         );
-    };
+    }, []);
     const totalReviewsCount = useMemo(() => {
         let count = userReviews?.length || 0;
         if (userReview && userReview.rating) {
@@ -80,65 +81,92 @@ const Page = () => {
         return count;
     }, [userReviews, userReview]);
     useEffect(() => {
-        if (id) getProduct(Number(id));
-    }, [id, getProduct]);
+        if (id && user?.id) {
+            setHasLoaded(false);
+            getProduct(Number(id), Number(user.id));
+        }
+    }, [id, user?.id]);
     useEffect(() => {
-        setSelectedImageIndex(0);
-        setSizesChosen({
-            'xs': false,
-            's': false,
-            'm': false,
-            'l': false,
-            'xl': false
-        });
+        if (!isLoading && (product || error)) {
+            setHasLoaded(true);
+        }
+    }, [isLoading, product, error]);
+    useEffect(() => {
+        if (product) {
+            setSelectedImageIndex(0);
+            setSizesChosen({
+                'xs': false,
+                's': false,
+                'm': false,
+                'l': false,
+                'xl': false
+            });
+            setQuantity(1);
+        }
     }, [product]);
     useEffect(() => {
-        if (id && user?.id) {
+        if (id && user?.id && product) {
             getUsersReviews(Number(id), user.id);
         }
-    }, [id, user?.id, getUsersReviews]);
+    }, [id, user?.id, product]);
     useEffect(() => {
         if (product?.id && user?.id) {
             getUserReview(product.id, user.id);
         }
-    }, [product?.id, user?.id, getUserReview]);
-    if (isLoading) {
-        return (
-            <div className='w-full flex items-center justify-center h-[80%]'>
-                <span className='loading loading-infinity loading-md'></span>
-            </div>
-        );
-    }
-    if (!isLoading && !product) {
-        return (
-            <div className='w-full flex items-center justify-center h-[80%]'>
-                <h1 className='font-raleway font-bold lg:text-8xl md:text-6xl text-3xl text-center text-red-500'>Error 404 Page Not Found</h1>
-            </div>
-        );
-    }
-    if (!isLoading && product && !product.is_visible) {
-        return (
-            <div className='w-full flex items-center justify-center h-[80%]'>
-                <h1 className='font-raleway font-bold lg:text-8xl md:text-6xl text-3xl text-center text-red-500'>Error 404 Page Not Found</h1>
-            </div>
-        );
-    }
-    const handleImageClick = (index: number) => {
+    }, [product?.id, user?.id]);
+    const handleImageClick = useCallback((index: number) => {
         setSelectedImageIndex(index);
-    };
+    }, []);
+    useEffect(() => {
+        return () => {
+            clearError();
+            clearProduct();
+        };
+    }, [clearError, clearProduct]);
+    if (isLoading || !hasLoaded) {
+        return (
+            <div className='w-full flex items-center justify-center h-[80vh]'>
+                <span className='loading loading-infinity loading-lg'></span>
+            </div>
+        );
+    }
+    if (error && hasLoaded) {
+        return (
+            <div className='w-full flex items-center justify-center h-[80vh]'>
+                <div className="text-center">
+                    <h1 className='font-raleway font-bold lg:text-6xl md:text-4xl text-2xl text-red-500 mb-4'>
+                        Error Loading Product
+                    </h1>
+                    <p className="text-lg text-gray-600">{String(error)}</p>
+                </div>
+            </div>
+        );
+    }
+    if (!isLoading && hasLoaded && (!product || !product.is_visible)) {
+        return (
+            <div className='w-full flex items-center justify-center h-[80vh]'>
+                <h1 className='font-raleway font-bold lg:text-6xl md:text-4xl text-2xl text-center text-red-500'>
+                    Error 404 - Page Not Found
+                </h1>
+            </div>
+        );
+    }
+    if (!product) {
+        return null;
+    }
     return (
         <div className="p-3 flex flex-col gap-14">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 bg-base-300 p-5 rounded-3xl">
                 <div className="flex flex-col justify-center items-center relative gap-5">
                     {product.discount && (
-                        <div className="absolute top-0 left-3">
+                        <div className="absolute top-0 left-3 z-10">
                             <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm font-raleway shadow-md">
                                 Discount: {product.discount}%
                             </p>
                         </div>
                     )}
                     {product.ends_in && (
-                        <div className="absolute top-0 right-3">
+                        <div className="absolute top-0 right-3 z-10">
                             <p className="text-primary bg-primary/30 px-3 py-2 rounded-3xl text-sm font-raleway shadow-md">
                                 Ends In: {new Date(product.ends_in).toLocaleDateString()}
                             </p>
@@ -199,6 +227,7 @@ const Page = () => {
                                     setQuantity(quantity - 1);
                                 }
                             }}
+                            disabled={quantity <= 1}
                         >-</button>
                         <p className="text-primary font-bold bg-primary/30 px-2 py-2 w-[3rem] h-[3rem] flex items-center justify-center rounded-full">{quantity}</p>
                         <button
@@ -275,9 +304,12 @@ const Page = () => {
                     <button
                         type="button"
                         className="btn btn-primary"
-                        disabled={selectedSizesCount === 0 || product.available === 0}
+                        disabled={selectedSizesCount === 0 || product.available === 0 || isUserCheckout == true}
                     >
-                        {selectedSizesCount === 0 ? 'Select Sizes' : product.available === 0 ? 'Out of Stock' : `CheckOut`}
+                        {isUserCheckout == true ? 'Already in Checkout' :
+                            selectedSizesCount === 0 ? 'Select Sizes' :
+                                product.available === 0 ? 'Out of Stock' :
+                                    'CheckOut'}
                     </button>
                 </div>
             </div>
@@ -286,24 +318,19 @@ const Page = () => {
                     User <span className="font-bold">Reviews</span>
                 </h1>
                 <div className="flex flex-col gap-5 max-h-[50rem] overflow-y-auto items-start justify-start w-full">
-                    {
-                        !isUserReviewLoading &&
+                    {!isUserReviewLoading && (
                         <Comment userReview={userReview} productId={product.id} />
-                    }
-                    {
-                        !isLoadingReviews &&
-                        userReviews != null &&
-                        userReviews.map((userReview: any, index: number) => (
-                            <Reviews
-                                key={index}
-                                user={userReview.displayname}
-                                profilePicture={userReview.profilepicture}
-                                rating={userReview.rating}
-                                isOdd={index % 2 !== 0}
-                                review={userReview.comment}
-                            />
-                        ))
-                    }
+                    )}
+                    {!isLoadingReviews && userReviews != null && userReviews.map((userReview: any, index: number) => (
+                        <Reviews
+                            key={index}
+                            user={userReview.displayname}
+                            profilePicture={userReview.profilepicture}
+                            rating={userReview.rating}
+                            isOdd={index % 2 !== 0}
+                            review={userReview.comment}
+                        />
+                    ))}
                 </div>
             </div>
         </div>

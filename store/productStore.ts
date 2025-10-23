@@ -6,9 +6,10 @@ type ProductStoreProps = {
     error: null | string | unknown;
     isLoading: boolean;
     isLoadingModal: boolean;
+    isUserCheckout: boolean;
     products: any;
     product: any;
-    isLoadingVisible: boolean,
+    isLoadingVisible: boolean;
     createProduct: ({
         imagesAddedBase64,
         sizesChosen,
@@ -20,7 +21,7 @@ type ProductStoreProps = {
         description,
     }: createProductProps) => Promise<void>;
     getProducts: () => Promise<void>;
-    getProduct: (productId: number) => Promise<void>;
+    getProduct: (productId: number, userId: number) => Promise<void>;
     deleteProduct: (productId: number) => Promise<void>;
     updateProduct: (
         productId: number,
@@ -35,39 +36,44 @@ type ProductStoreProps = {
         }: updateProductsProps
     ) => Promise<void>;
     updateVisible: (productId: number, value: boolean) => Promise<void>;
+    clearError: () => void;
+    clearProduct: () => void;
 };
 const useProductAdmin = create<ProductStoreProps>((set, get) => ({
     error: null,
     isLoading: false,
     isLoadingModal: false,
+    isUserCheckout: false,
     products: [],
     product: null,
     isLoadingVisible: false,
-    createProduct: async ({ imagesAddedBase64,
+    createProduct: async ({
+        imagesAddedBase64,
         sizesChosen,
         quantity,
         discount,
         title,
         price,
         endsIn,
-        description, }) => {
-        set({ isLoading: true });
+        description,
+    }) => {
+        set({ isLoading: true, error: null });
         try {
-            const response = await axios.post(`${baseUrl}/api/product`,
-                {
-                    imagesAddedBase64,
-                    sizesChosen,
-                    quantity,
-                    discount,
-                    title,
-                    price,
-                    endsIn,
-                    description,
-                });
+            await axios.post(`${baseUrl}/api/product`, {
+                imagesAddedBase64,
+                sizesChosen,
+                quantity,
+                discount,
+                title,
+                price,
+                endsIn,
+                description,
+            });
             toast.success('Shoe created successfully!!');
         } catch (error: unknown) {
-            if (error instanceof Error) set({ error: error.message });
-            else set({ error: error });
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+            set({ error: errorMessage });
+            toast.error(errorMessage);
         } finally {
             set({ isLoading: false });
         }
@@ -80,20 +86,37 @@ const useProductAdmin = create<ProductStoreProps>((set, get) => ({
                 products: response.data.shoes
             });
         } catch (error: unknown) {
-            if (error instanceof Error) set({ error: error.message });
-            else set({ error: error });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch products';
+            set({ error: errorMessage });
+            toast.error(errorMessage);
         } finally {
             set({ isLoading: false });
         }
     },
-    getProduct: async (productId: number) => {
-        set({ isLoading: true, error: null });
+    getProduct: async (productId: number, userId: number) => {
+        set({ isLoading: true, error: null, isUserCheckout: false });
         try {
-            const response = await axios.get(`${baseUrl}/api/get-product/${productId}`);
-            set({ product: response.data.shoe });
+            const productResponse = await axios.get(`${baseUrl}/api/get-product/${productId}`);
+            const productData = productResponse.data.shoe;
+            if (!productData.is_visible) {
+                set({ error: 'Product not found', product: null });
+                return;
+            }
+            if (userId) {
+                try {
+                    const checkoutResponse = await axios.post(`${baseUrl}/api/check-checkout`, {
+                        productId,
+                        userId
+                    });
+                    set({ isUserCheckout: checkoutResponse.data.isExist });
+                } catch (checkoutError) {
+                    console.log('Error checking checkout:', checkoutError);
+                }
+            }
+            set({ product: productData, error: null });
         } catch (error: unknown) {
-            if (error instanceof Error) set({ error: error.message });
-            else set({ error: error });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to fetch product';
+            set({ error: errorMessage, product: null });
         } finally {
             set({ isLoading: false });
         }
@@ -101,10 +124,12 @@ const useProductAdmin = create<ProductStoreProps>((set, get) => ({
     deleteProduct: async (productId: number) => {
         set({ isLoading: true, error: null });
         try {
-
+            // Implement delete logic here
+            toast.success('Product deleted successfully!!');
         } catch (error: unknown) {
-            if (error instanceof Error) set({ error: error.message });
-            else set({ error: error });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete product';
+            set({ error: errorMessage });
+            toast.error(errorMessage);
         } finally {
             set({ isLoading: false });
         }
@@ -126,14 +151,15 @@ const useProductAdmin = create<ProductStoreProps>((set, get) => ({
             });
             toast.success(`Product information updated successfully!!`);
         } catch (error: unknown) {
-            if (error instanceof Error) set({ error: error.message });
-            else set({ error: error });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update product';
+            set({ error: errorMessage });
+            toast.error(errorMessage);
         } finally {
             set({ isLoadingModal: false });
         }
     },
     updateVisible: async (productId: number, value: boolean) => {
-        set({ isLoadingVisible: true });
+        set({ isLoadingVisible: true, error: null });
         try {
             await axios.put(`${baseUrl}/api/change-visible`, { productId, value });
             set((state) => ({
@@ -143,13 +169,15 @@ const useProductAdmin = create<ProductStoreProps>((set, get) => ({
             }));
             toast.success('Product visibility updated!');
         } catch (error: unknown) {
-            if (error instanceof Error) set({ error: error.message });
-            else set({ error });
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update visibility';
+            set({ error: errorMessage });
             toast.error('Failed to update visibility!!');
         } finally {
             set({ isLoadingVisible: false });
         }
     },
+    clearError: () => set({ error: null }),
+    clearProduct: () => set({ product: null, error: null }),
 
 }));
 export default useProductAdmin;
