@@ -107,3 +107,15 @@ export interface createProductProps {
     endsIn: string;
     description: string;
 }
+export interface MonthlySalesData {
+    revenue: number;
+    salesCount: number;
+}
+export interface MonthlySales {
+    [key: string]: MonthlySalesData;
+}
+export type ChartType = 'bar' | 'line' | 'doughnut';
+export interface SalesChartProps {
+    monthlySales: MonthlySales;
+    chartType?: ChartType;
+}

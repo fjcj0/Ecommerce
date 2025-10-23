@@ -82,8 +82,8 @@ const CheckOutCard = ({
     const basePrice = price ? parseFloat(price) : 0;
     const discountPercent = discount ? parseFloat(discount) : 0;
     const discountedPrice = basePrice * (1 - discountPercent / 100);
-    const totalPrice = discountedPrice * quantity;
     const selectedSizesCount = sizes ? Object.values(sizes).filter(Boolean).length : 0;
+    const totalPrice = discountedPrice * quantity * selectedSizesCount;
     return (
         <div className='flex flex-col md:flex-row justify-between items-start bg-base-300 p-4 rounded-xl gap-4 mb-4'>
             <div className='flex-shrink-0'>
@@ -145,6 +145,7 @@ const CheckOutCard = ({
                     </div>
                 </div>
                 <div className='flex flex-col gap-2'>
+                    <span className='font-semibold'>Sizes:</span>
                     <div className='flex flex-wrap gap-2'>
                         {sizesOptions.map((sizeOption) => {
                             const isSelected = sizes?.[sizeOption.key as keyof typeof sizes] || false;
@@ -167,7 +168,7 @@ const CheckOutCard = ({
                     </span>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 export default CheckOutCard;
